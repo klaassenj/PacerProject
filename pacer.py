@@ -1,6 +1,7 @@
 greenLED = 16
 blueLED = 12
-infrared = 18
+leftIR = 18
+rightIR = 23
 
 import pigpio
 import time
@@ -13,11 +14,13 @@ if not pi.connected:
 else:
     while True:
         try:
-            IR = pi.read(18)
-            if(IR == 0):
-                print('Left!')
+            leftSignal = pi.read(leftIR)
+            if(leftSignal == 0):
+                lightLED(pi, greenLED)
+            elif (rightSignal == 0):
+                lightLED(pi, blueLED)
             else:
-                print('Straight!')
+                clearAll(pi)
             time.sleep(1/60)
         except KeyboardInterrupt:
             print('Keyboard Interrupted. Stopping...')
@@ -25,6 +28,13 @@ else:
                 print(datum[0], datum[1])
             pi.stop()
 
+
+def lightLED(pi, pin):
+    pi.write(pin, 1)
+    
+def clearAll(pi):
+    pi.write(greenLED, 0)
+    pi.write(blueLED, 0)
 
 def flashLEDs(pi):
     pi.write(12, 1)

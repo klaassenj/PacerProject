@@ -8,27 +8,6 @@ import time
 
 pi = pigpio.pi()
 
-data = []
-if not pi.connected:
-    exit();
-else:
-    while True:
-        try:
-            leftSignal = pi.read(leftIR)
-            if(leftSignal == 0):
-                lightLED(pi, greenLED)
-            elif (rightSignal == 0):
-                lightLED(pi, blueLED)
-            else:
-                clearAll(pi)
-            time.sleep(1/60)
-        except KeyboardInterrupt:
-            print('Keyboard Interrupted. Stopping...')
-            for datum in data:
-                print(datum[0], datum[1])
-            pi.stop()
-
-
 def lightLED(pi, pin):
     pi.write(pin, 1)
     
@@ -43,3 +22,29 @@ def flashLEDs(pi):
     pi.write(12, 0)
     pi.write(16, 1)
     time.sleep(1)
+
+
+
+
+if not pi.connected:
+    exit();
+else:
+    while True:
+        try:
+            leftSignal = pi.read(leftIR)
+            rightSignal = pi.read(rightIR)
+            if(leftSignal == 0):
+                lightLED(pi, greenLED)
+            elif (rightSignal == 0):
+                lightLED(pi, blueLED)
+            else:
+                clearAll(pi)
+            time.sleep(1/60)
+        except KeyboardInterrupt:
+            print('Keyboard Interrupted. Stopping...')
+            for datum in data:
+                print(datum[0], datum[1])
+            pi.stop()
+
+
+

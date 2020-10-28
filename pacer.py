@@ -1,15 +1,3 @@
-greenLED = 16
-blueLED = 12
-leftIR = 18
-rightIR = 23
-
-servoMin = 250
-servoMax = 400
-servoMiddle = (400 - 250) // 2
-
-
-pwm = Adafruit_PCA9685.PCA9685(address=0x40, busnum=0)
-
 from __future__ import division
 import time
 
@@ -18,6 +6,22 @@ import Adafruit_PCA9685
 
 import pigpio
 import time
+
+
+leftIR = 18
+rightIR = 23
+
+
+servoMin = 260
+servoMax = 490
+servoMiddle = (servoMax + servoMin) // 2
+
+steeringPercentage = 0.05
+steeringAmount = (servoMax - servoMin) * steeringPercentage
+
+pwm = Adafruit_PCA9685.PCA9685()
+
+
 
 pi = pigpio.pi()
 
@@ -37,31 +41,17 @@ def flashLEDs(pi):
     time.sleep(1)
 
 
-def steerLeft():
-    direction -= amount
-
-def revertToStraight():
-    direction = servoMiddle
-
 
 leftSignal = 1
 rightSignal = 1
-direction = servoMin
+direction = servoMiddle
 
-try:
-    while True:
-        pwm.set_pwm(0, 0, direction)
-        time.sleep(0.1)
-        direction += 1
-        if(direction > servoMax):
-            direction = servoMin
-            time.sleep(1)
-except KeyboardInterrupt:
-    print("Testing Complete.")
-    direction = servoMiddle
-    pwm.set_pwm(0, 0, direction)
-    time.sleep(1)
 
+def steerLeft(direction):
+    return direction + steeringAmount
+
+def revertToStraight():
+    return servoMiddle
 
 
 if not pi.connected:
@@ -72,14 +62,15 @@ else:
             leftSignal = pi.read(leftIR)
             rightSignal = pi.read(rightIR)
             if(leftSignal == 0):
-                steerLeft()
+                direction = steerLeft(direction)
             else:
-                revertToStraight()
-            pwm.set_pwm(0, 0, direction)
+                direction = revertToStraight()
+            pwm.set_pwm(0, 0, int(direction))
             time.sleep(1/60)
         except KeyboardInterrupt:
             print('Keyboard Interrupted. Stopping...')
             pi.stop()
+            pwm.set_pwm(0, 0, servoMax)
             time.sleep(1)
 
 

@@ -12,8 +12,8 @@ leftIR = 18
 rightIR = 23
 
 
-servoMin = 260
-servoMax = 490
+servoMin = 220
+servoMax = 400
 servoMiddle = (servoMax + servoMin) // 2
 
 steeringPercentage = 0.05
@@ -48,7 +48,7 @@ direction = servoMiddle
 
 
 def steerLeft(direction):
-    return direction + steeringAmount
+    return direction - steeringAmount
 
 def revertToStraight():
     return servoMiddle

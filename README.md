@@ -10,7 +10,7 @@ Pi powered Traxxas Slash follows the lines on the track to pace athletes to Pers
 - Servo Driver board
 - Traxxas Slash 2WD
 - Long Life RC Car Battery
-- 20000 mAh Portable Battery
+- 10000 mAh Portable Battery
 - Pi Camera
 - Bluetooth Speaker
 

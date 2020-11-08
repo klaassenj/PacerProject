@@ -11,8 +11,8 @@ import time
 leftIR = 18
 rightIR = 23
 
-servoMin = 260
-servoMax = 490
+servoMin = 200
+servoMax = 500
 servoMiddle = (servoMax + servoMin) // 2
 
 

@@ -1,8 +1,30 @@
-# Helps to figure out Max and Min values for ESC
-# Using Right and Left Arrow keys, one can figure out Max and Min turn values
-# Using Up and Down Arrow keys, one can settle on a speed limits suitable for the future task.
-# Modified from http://www.codehaven.co.uk/using-arrow-keys-with-inputs-python/
-# Author: Udayan Kumar
+'''
+Pacer Project Operational Logic
+
+Modified from http://www.codehaven.co.uk/using-arrow-keys-with-inputs-python/
+Modified from: Udayan Kumar
+Author: Jason Klaassen
+
+Hardware Setup
+	Raspberry Pi 3B+
+	4 Generic IR sensors on pins 12, 16, 18, 23
+		These sensors must have their potentiometer tuned for
+		the track in the shade as the shell should be modified
+		to block all sunlight from reaching underneath the vehicle
+		and fooling the sensors 
+	Serial Cable for Debugging
+	Anker 10,000 mAh Battery Bank
+	Adafruit PCA9685 Servo Driver on the SDA and SLK pins
+	Traxxas Slash 2WD RC Truck - Duct tape added to block sunlight
+		from getting underneath and messing with sensors.
+	Fritzing Diagram available in Pacer.fzz
+Inputs: 
+	arg1 - integer between 1 - 10 - Describes how fast turning
+		should accelerate when encountering a white line
+	arg2 - integer - Describes the sampleRate or logical updates
+		per second. Multiplied by 10 to be easier to type without
+		a screen. Ex. 3 >>> 30 ups, 12 >>> 120 ups
+'''
 from __future__ import division
 import curses
 import time

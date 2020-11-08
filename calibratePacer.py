@@ -60,7 +60,7 @@ if(len(args) > 1):
 if(len(args) > 2):
     sampleRate = int(args[2]) * 10
 if(len(args) > 3):
-    preferredSpeed = int(args(3))
+    preferredSpeed = int(args[3])
     
 motorMin = 300
 motorMax = 400
@@ -169,6 +169,7 @@ try:
 	    else:
 		current_movement = 340
 	    move = True
+	    screen.addstr(0, 0, 'Speed Set at    ' + str(current_movement))
 	elif char == ord('s'):
             # stop everything 
             current_movement = getStop() 

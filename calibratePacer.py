@@ -26,14 +26,17 @@ if(len(args) > 2):
     
 motorMin = 300
 motorMax = 400
-speedOptions = [(x * 10 + 320) for x in range(0, 10)]
+speedOptions = [(x * 15 + 320) for x in range(0, 10)]
 resp = 2
-leftIR = 18
-rightIR = 23
+sensorA = 23
+sensorB = 12
+sensorC = 16
+sensorD = 18
 servoMin = 220
 servoMax = 400
 pulseFrequency = 50 # ESC takes 50 Hz
 
+stopRC = False
 
 pwm.set_pwm_freq(pulseFrequency)
 pi = pigpio.pi()
@@ -41,7 +44,7 @@ pi = pigpio.pi()
 def getStop():
     return motorMin
 
-def follow_lines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, leftIR, rightIR):
+def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD):
     #Initialize Variables
     leftSignal = 1
     rightSignal = 1
@@ -52,11 +55,16 @@ def follow_lines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, leftIR, 
         try:
             while True:
                 # Read IRs
-                leftSignal = pi.read(leftIR)
-                rightSignal = pi.read(rightIR)
-                if(leftSignal == 0):
+                leftSignal = pi.read(sensorA)
+                rightSignal = pi.read(sensorD)
+                middleSignal = pi.read(sensorB) + pi.read(sensorC) 
+                if(middleSignal == 0):
+		    direction = servoMiddle
+		elif(leftSignal == 0):
                     # Turn Left
                     direction -= steeringAmount
+		elif(rightSignal == 0):
+		    direction += steeringAmount	
                 else:
                     # Revert to Straight
                     direction = servoMiddle
@@ -65,13 +73,14 @@ def follow_lines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, leftIR, 
         except KeyboardInterrupt:
             print('Keyboard Interrupted. Stopping...')
             pi.stop()
-            pwm.set_pwm(0, 0, servoMax)
+            pwm.set_pwm(0, 0, servoMiddle)
             time.sleep(1)
 
+
 try:
-    thread.start_new_thread(follow_lines, (pwm, pi, servoMin, servoMax, steerPercent, sampleRate, leftIR, rightIR))
+    thread.start_new_thread(followLines, (pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD))
 except:
-    print("Steering Thread Failed to Start")
+    print("Steering or Kill Switch Thread Failed to Start")
     
 
 current_movement = getStop()
@@ -91,7 +100,7 @@ screen.keypad(True)
  
 # press s to stop 
 try:
-    while True:
+    while not stopRC:
         char = screen.getch()
         screen.clear()
         move = False
@@ -130,4 +139,5 @@ finally:
     curses.nocbreak(); screen.keypad(0); curses.echo()
     curses.endwin()
     pwm.set_pwm(1, 0, motorMin)
+    time.sleep(1)
 

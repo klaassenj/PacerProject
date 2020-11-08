@@ -24,6 +24,20 @@ Inputs:
 	arg2 - integer - Describes the sampleRate or logical updates
 		per second. Multiplied by 10 to be easier to type without
 		a screen. Ex. 3 >>> 30 ups, 12 >>> 120 ups
+	arg3 - integer - Exact PWM signal for ESC Speed. Ex. 350 or 430
+		general range between 330 (5mph)  -  450 (17+ mph)
+
+Usage:
+
+	Once running, number keys 1 - 9 can be used to set the car to predefined
+		speed ( 1 >> 330, 2, >> 340, ..., 9 >> 410 )
+	
+	The '0' and 'Enter' keys will stop the motor, so the car will coast
+	to a stop. Since PWM is used not PPM, there is no brake. Using PPM 
+	would be a nice upgrade, but unecessary for Pacing.
+	
+	The 'P' key sets the car to run at the 'preferredSpeed' set by arg3.
+	This is great for calibrating..
 '''
 from __future__ import division
 import curses
@@ -40,11 +54,13 @@ args = sys.argv
 file = args[0]
 steerPercent = 0.05
 sampleRate = 60
-
+preferredSpeed = -1
 if(len(args) > 1):
     steerPercent = int(args[1]) / 100
 if(len(args) > 2):
     sampleRate = int(args[2]) * 10
+if(len(args) > 3):
+    preferredSpeed = int(args(3))
     
 motorMin = 300
 motorMax = 400
@@ -147,7 +163,13 @@ try:
             current_movement = speedOptions[index] 
             move = True
             screen.addstr(0, 0, 'Speed Set at    ' + str(index) + ":  "+ str(current_movement))
-        elif char == ord('s'):
+        elif char == ord('p'):
+	    if(320 < preferredSpeed < 440):
+	        current_movement = preferredSpeed
+	    else:
+		current_movement = 340
+	    move = True
+	elif char == ord('s'):
             # stop everything 
             current_movement = getStop() 
             current_turn_position  = getCenter()

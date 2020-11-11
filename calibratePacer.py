@@ -3,6 +3,7 @@ Pacer Project Operational Logic
 
 Modified from http://www.codehaven.co.uk/using-arrow-keys-with-inputs-python/
 Modified from: Udayan Kumar
+PID Algorithm adapted from Marcelo Rovai's C++ Algorithm - https://www.instructables.com/Line-Follower-Robot-PID-Control-Android-Setup/
 Author: Jason Klaassen
 
 Hardware Setup
@@ -75,6 +76,7 @@ servoMax = 400
 pulseFrequency = 50 # ESC takes 50 Hz
 
 stopRC = False
+currentThrottle = 0
 
 pwm.set_pwm_freq(pulseFrequency)
 pi = pigpio.pi()
@@ -82,6 +84,80 @@ pi = pigpio.pi()
 def getStop():
     return motorMin
 
+# void calculatePID()
+# {
+#   P = error;
+#   I = I + error;
+#   D = error-previousError;
+#   PIDvalue = (Kp*P) + (Ki*I) + (Kd*D);
+#   previousError = error;
+# }
+
+
+# void motorPIDcontrol()
+# {
+#   int leftMotorSpeed = 1500 - iniMotorPower - PIDvalue;
+#   int rightMotorSpeed = 1500 + iniMotorPower - PIDvalue;
+  
+#   leftServo.writeMicroseconds(leftMotorSpeed);
+#   rightServo.writeMicroseconds(rightMotorSpeed);
+# }
+
+def followLinesPID(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD, sensorX, sensorY):
+    # Variables
+    error = 0
+    previousError = 0
+    positionConstant = 25
+    integralConstant = 1
+    derivativeConstant = 0
+    direction = servoMiddle
+    try:
+        while True:
+            # Read IR Sensor Array
+            # The 1 - swaps the 0 reading of white lines to 1 for easier logic
+            left1 = 1 - pi.read(sensorA)
+            left2 = 1 - pi.read(sensorB)
+            left3 = 1 - pi.read(sensorC)
+            centerLeft = 1- pi.read(sensorX)
+            centerRight = 1 - pi.read(sensorY)
+            right3 = 1 - pi.read(sensorD)
+            right2 = 1 - pi.read(sensorE)
+            right1 = 1 - pi.read(sensorF)
+            # Calculate Error
+            error = 0
+            if(not centerLeft):
+                error = -1
+            if(not centerRight):
+                error = 1
+            if(left3):
+                error = -2
+            if(left2):
+                error = -3
+            if(left1):
+                error = -4
+            if(right3):
+                error = 2
+            if(right2):
+                error = 3
+            if(right1):
+                error = 4
+            # Calculate Corrective Action
+            position = error
+            integral += error
+            derivative = error - previousError
+            result = (turnConstant * position) + (integralConstant * integral) + (derivativeConstant * derivative);
+            previousError = error
+            # Execute CorrectiveAction
+            direction = servoMiddle + result
+            pwm.set_pwm(0, 0, int(direction))
+            time.sleep(1/sampleRate)
+    except KeyboardInterrupt:
+        print('Keyboard Interrupted. Stopping...')
+        pi.stop()
+        pwm.set_pwm(0, 0, servoMiddle)
+        time.sleep(1)
+
+        
 def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD):
     #Initialize Variables
     leftSignal = 1
@@ -121,7 +197,7 @@ except:
     print("Steering or Kill Switch Thread Failed to Start")
     
 
-current_movement = getStop()
+currentThrottle = getStop()
 
 
 # get the curses screen window
@@ -145,40 +221,40 @@ try:
         if char == ord('q'):
             break
         elif char == curses.KEY_UP:
-            if current_movement < motorMax:
-                current_movement += resp 
+            if currentThrottle < motorMax:
+                currentThrottle += resp 
                 move = True
-            screen.addstr(0, 0, 'up   ' + str(current_movement))       
+            screen.addstr(0, 0, 'up   ' + str(currentThrottle))       
         elif char == curses.KEY_DOWN:
-            if current_movement > motorMin:
-                current_movement -= resp 
+            if currentThrottle > motorMin:
+                currentThrottle -= resp 
                 move = True
-            screen.addstr(0, 0, 'down    ' + str(current_movement))
+            screen.addstr(0, 0, 'down    ' + str(currentThrottle))
         elif char == ord('\n'):
-            current_movement = motorMin 
+            currentThrottle = motorMin 
             move = True
-            screen.addstr(0, 0, 'Stoppp    ' + str(current_movement))     
+            screen.addstr(0, 0, 'Stoppp    ' + str(currentThrottle))     
         elif 48 <= char and char <= 57:
             index = int(char) - 48
-            current_movement = speedOptions[index] 
+            currentThrottle = speedOptions[index] 
             move = True
-            screen.addstr(0, 0, 'Speed Set at    ' + str(index) + ":  "+ str(current_movement))
+            screen.addstr(0, 0, 'Speed Set at    ' + str(index) + ":  "+ str(currentThrottle))
         elif char == ord('p'):
-	    if(320 < preferredSpeed < 440):
-	        current_movement = preferredSpeed
-	    else:
-		current_movement = 340
-	    move = True
-	    screen.addstr(0, 0, 'Speed Set at    ' + str(current_movement))
-	elif char == ord('s'):
+            if(320 < preferredSpeed < 440):
+                currentThrottle = preferredSpeed
+            else:
+            currentThrottle = 340
+            move = True
+            screen.addstr(0, 0, 'Speed Set at    ' + str(currentThrottle))
+	    elif char == ord('s'):
             # stop everything 
-            current_movement = getStop() 
+            currentThrottle = getStop() 
             current_turn_position  = getCenter()
-            screen.addstr(0, 0, 'up    ' + str(current_movement) + ' and down ' + str(current_turn_position))       
+            screen.addstr(0, 0, 'up    ' + str(currentThrottle) + ' and down ' + str(current_turn_position))       
             move = True
         
         if move:
-            pwm.set_pwm(1, 0, current_movement)
+            pwm.set_pwm(1, 0, currentThrottle)
 finally:
     # shut down cleanly
     curses.nocbreak(); screen.keypad(0); curses.echo()

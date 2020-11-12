@@ -55,13 +55,16 @@ args = sys.argv
 file = args[0]
 steerPercent = 0.05
 sampleRate = 60
+lineTolerance = 10
 preferredSpeed = -1
 if(len(args) > 1):
     steerPercent = int(args[1]) / 100
 if(len(args) > 2):
     sampleRate = int(args[2]) * 10
-if(len(args) > 3):
-    preferredSpeed = int(args[3])
+if(len(args > 3):
+    lineTolerance = int(args[3])
+if(len(args) > 4):
+    preferredSpeed = int(args[4])
     
 motorMin = 300
 motorMax = 400
@@ -71,6 +74,8 @@ sensorA = 23
 sensorB = 12
 sensorC = 16
 sensorD = 18
+sensorJ = 5
+sensorK = 10
 servoMin = 220
 servoMax = 400
 pulseFrequency = 50 # ESC takes 50 Hz
@@ -158,10 +163,13 @@ def followLinesPID(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensor
         time.sleep(1)
 
         
-def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD):
+def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD, sensorJ, sensorK):
     #Initialize Variables
     leftSignal = 1
     rightSignal = 1
+    middleSignal = 1
+    lineLeftSignal = 1
+    lineRightSIgnal = 1
     servoMiddle = (servoMax + servoMin) // 2
     direction = servoMiddle
     steeringAmount = (servoMax - servoMin) * steerPercent
@@ -171,17 +179,28 @@ def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, 
                 # Read IRs
                 leftSignal = pi.read(sensorA)
                 rightSignal = pi.read(sensorD)
-                middleSignal = pi.read(sensorB) + pi.read(sensorC) 
-                if(middleSignal == 0):
+                middleSignal = pi.read(sensorB) + pi.read(sensorC)
+		lineLeftSignal = pi.read(sensorJ)
+		lineRightSignal = pi.read(sensorK) 
+                
+		if(middleSignal == 0):
 		    direction = servoMiddle
 		elif(leftSignal == 0):
                     # Turn Left
                     direction -= steeringAmount
 		elif(rightSignal == 0):
 		    direction += steeringAmount	
+		elif(lineLeftSignal == 0):
+		    direction -= steeringAmount / lineTolerance
+		elif(lineRightSignal == 0):
+		    direction += steeringAmount / lineTolerance
                 else:
                     # Revert to Straight
                     direction = servoMiddle
+		if(direction < 270):
+			direction = 270
+		elif(direction > 350):
+			direction = 350
                 pwm.set_pwm(0, 0, int(direction))
                 time.sleep(1/sampleRate)
         except KeyboardInterrupt:
@@ -192,7 +211,7 @@ def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, 
 
 
 try:
-    thread.start_new_thread(followLines, (pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD))
+    thread.start_new_thread(followLines, (pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, sensorB, sensorC, sensorD, sensorJ, sensorK))
 except:
     print("Steering or Kill Switch Thread Failed to Start")
     

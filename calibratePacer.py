@@ -54,13 +54,16 @@ args = sys.argv
 file = args[0]
 steerPercent = 0.05
 sampleRate = 60
+lineTolerance = 10
 preferredSpeed = -1
 if(len(args) > 1):
     steerPercent = int(args[1]) / 100
 if(len(args) > 2):
     sampleRate = int(args[2]) * 10
-if(len(args) > 3):
-    preferredSpeed = int(args[3])
+if(len(args > 3):
+    lineTolerance = int(args[3])
+if(len(args) > 4):
+    preferredSpeed = int(args[4])
     
 motorMin = 300
 motorMax = 400
@@ -112,9 +115,9 @@ def followLines(pwm, pi, servoMin, servoMax, steerPercent, sampleRate, sensorA, 
 		elif(rightSignal == 0):
 		    direction += steeringAmount	
 		elif(lineLeftSignal == 0):
-		    direction -= steeringAmount / 4
+		    direction -= steeringAmount / lineTolerance
 		elif(lineRightSignal == 0):
-		    direction += steeringAmount / 4
+		    direction += steeringAmount / lineTolerance
                 else:
                     # Revert to Straight
                     direction = servoMiddle

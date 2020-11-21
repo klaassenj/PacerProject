@@ -15,29 +15,29 @@ train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
 image_size = 100
 
-# Directory with our training cat pictures
-train_cats_dir = os.path.join(train_dir, 'left')
+# Directory with our training left pictures
+train_lefts_dir = os.path.join(train_dir, 'left')
 
-# Directory with our training dog pictures
-train_dogs_dir = os.path.join(train_dir, 'right')
+# Directory with our training right pictures
+train_rights_dir = os.path.join(train_dir, 'right')
 
-# Directory with our validation cat pictures
-validation_cats_dir = os.path.join(validation_dir, 'left')
+# Directory with our validation left pictures
+validation_lefts_dir = os.path.join(validation_dir, 'left')
 
-# Directory with our validation dog pictures
-validation_dogs_dir = os.path.join(validation_dir, 'right')
+# Directory with our validation right pictures
+validation_rights_dir = os.path.join(validation_dir, 'right')
 
-train_cat_fnames = os.listdir(train_cats_dir)
-print(train_cat_fnames[:10])
+train_left_fnames = os.listdir(train_lefts_dir)
+print(train_left_fnames[:10])
 
-train_dog_fnames = os.listdir(train_dogs_dir)
-train_dog_fnames.sort()
-print(train_dog_fnames[:10])
+train_right_fnames = os.listdir(train_rights_dir)
+train_right_fnames.sort()
+print(train_right_fnames[:10])
 
-print('total training cat images:', len(os.listdir(train_cats_dir)))
-print('total training dog images:', len(os.listdir(train_dogs_dir)))
-print('total validation cat images:', len(os.listdir(validation_cats_dir)))
-print('total validation dog images:', len(os.listdir(validation_dogs_dir)))
+print('total training left images:', len(os.listdir(train_lefts_dir)))
+print('total training right images:', len(os.listdir(train_rights_dir)))
+print('total validation left images:', len(os.listdir(validation_lefts_dir)))
+print('total validation right images:', len(os.listdir(validation_rights_dir)))
 
 
 # Our input feature map is 150x150x3: 150x150 for the image pixels, and 3 for
@@ -111,19 +111,30 @@ history = model.fit_generator(
       validation_steps=50,  # 1000 images = batch_size * steps
       verbose=2)
 
+model.save_weights("weights")
+
+uncompiledModel = Model(img_input, output)
+uncompiledModel.load_weights("weights")
+
 # LEFT --------------
 
-# Let's prepare a random input image of a cat or dog from the training set.
-cat_img_files = [os.path.join(train_cats_dir, f) for f in train_cat_fnames]
-dog_img_files = [os.path.join(train_dogs_dir, f) for f in train_dog_fnames]
-img_path = random.choice(cat_img_files)
-
+# Let's prepare a random input image of a left or right from the training set.
+left_img_files = [os.path.join(train_lefts_dir, f) for f in train_left_fnames]
+right_img_files = [os.path.join(train_rights_dir, f) for f in train_right_fnames]
+img_path = random.choice(left_img_files)
 img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
 x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
 x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-
-# Rescale by 1/255
 x /= 255
+
+print("Uncompiled")
+for i in range(10):
+    start = time.time()
+    results = uncompiledModel.predict(x)
+    timeTaken = time.time() - start
+    print(results, timeTaken)
+    
+print("Compiled")
 for i in range(10):
     start = time.time()
     results = model.predict(x)
@@ -133,18 +144,14 @@ for i in range(10):
 
 # RIGHT --------------
 
-img_path = random.choice(dog_img_files)
-
+img_path = random.choice(right_img_files)
 img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
 x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
 x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
 # Rescale by 1/255
 x /= 255
 
-model.save_weights("weights")
 
-uncompiledModel = Model(img_input, output)
-uncompiledModel.load_weights("weights")
 
 print("Uncompiled")
 for i in range(10):

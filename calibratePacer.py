@@ -78,6 +78,7 @@ sensorJ = 5
 sensorK = 10
 servoMin = 220
 servoMax = 400
+servoMiddle = (servoMax + servoMin) // 2
 pulseFrequency = 50 # ESC takes 50 Hz
 
 stopRC = False

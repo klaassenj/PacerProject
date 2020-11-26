@@ -2,6 +2,9 @@
 import os
 import zipfile
 import time
+from tensorflow import keras
+from tensorflow.keras import optimizers
+from tensorflow.keras.optimizers import schedules
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras import layers
 from tensorflow.keras import Model
@@ -58,6 +61,9 @@ model.compile(loss='binary_crossentropy',
 model.load_weights("weights")              
 # Model is Ready
 
+def setDirection(results):
+    print("Setting Direction")
+
 # Define Camera Function
 def processImages():
     global numCycles
@@ -67,8 +73,9 @@ def processImages():
         stream.seek(0)
         image = Image.open(stream)
         results = model.predict(image)
-        print("Camera Results:", results)
+        print("Camera Results Frame "+ str(i) + ":", results)
         # Turn Wheels
+        # pwm.set_pwm(0, 0, setDirection(results))
         stream.seek(0)
         stream.truncate()
     numCycles += 1

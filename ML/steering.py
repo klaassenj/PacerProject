@@ -86,6 +86,7 @@ def processImages():
         yield stream
         startTime = time.time()
         stream.seek(0)
+        seekTime = time.time()
         image = Image.open(stream)
         openImageTime = time.time()
         pixelArray = img_to_array(image) 
@@ -102,10 +103,13 @@ def processImages():
         stream.seek(0)
         stream.truncate()
         truncateTime = time.time()
-        print("Seek and Open Image:", openImageTime - startTime)
+        print("-------------------")
+        print("Seek Time:", seekTime - startTime)
+        print("Open Image:", openImageTime - seekTime)
         print("Convert Image to Pixel Array:", convertTime - openImageTime)
         print("Predict from Image:", predictTime - convertTime)
         print("Go to next Image:", truncateTime - predictTime)
+        print("-------------------")
     numCycles += 1
 
 with picamera.PiCamera() as camera:

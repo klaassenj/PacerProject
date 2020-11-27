@@ -95,7 +95,7 @@ with picamera.PiCamera() as camera:
             outputs = [io.BytesIO() for i in range(capturesPerCycle)]
             startTime = time.time()
             # Capture Image
-            camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
+            camera.capture_sequence(processImages(), 'jpg', use_video_port=True)
             endTime = time.time()
             print("Time Taken: ", endTime - startTime)
             print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")

@@ -81,22 +81,21 @@ def processImages():
     global sess
     global graph
     stream = io.BytesIO()
-    for i in range(capturesPerCycle):
-        yield stream
-        stream.seek(0)
-        image = Image.open(stream)
-        pixelArray = img_to_array(image) 
-        pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
-        print("Predicting the Future...")
-        with graph.as_default():
-            set_session(sess)
+    with graph.as_default():
+        set_session(sess)
+        for i in range(capturesPerCycle):
+            yield stream
+            stream.seek(0)
+            image = Image.open(stream)
+            pixelArray = img_to_array(image) 
+            pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
             results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
-        # Turn Wheels
-        # pwm.set_pwm(0, 0, setDirection(results))
-        stream.seek(0)
-        stream.truncate()
-    numCycles += 1
+            # Turn Wheels
+            # pwm.set_pwm(0, 0, setDirection(results))
+            stream.seek(0)
+            stream.truncate()
+        numCycles += 1
 
 with picamera.PiCamera() as camera:
     print("Initialize Camera")
@@ -109,13 +108,19 @@ with picamera.PiCamera() as camera:
     print("Starting Main Loop")
     try:
         while True:
-            outputs = [io.BytesIO() for i in range(capturesPerCycle)]
             startTime = time.time()
+            outputs = [io.BytesIO() for i in range(capturesPerCycle)]
+            createOutputsTime = time.time()
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
+            capturesTime = time.time()
+            
+            print("Time Taken: ", capturesTime - startTime)
+            print(str(capturesPerCycle) + " images at ", capturesPerCycle / (capturesTime - startTime), "FPS")
             endTime = time.time()
-            print("Time Taken: ", endTime - startTime)
-            print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
+            print("Outputs Created in:", createOutputsTime - startTime)
+            print("Camera Captures in:", capturesTime - (createOutputsTime + startTime))
+            print("Printing Stuff in:", endTime - (capturesTime + createOutputsTime + startTime))
             time.sleep(0.5)
     except KeyboardInterrupt:
         print("Completed")

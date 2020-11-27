@@ -73,7 +73,9 @@ def processImages():
         yield stream
         stream.seek(0)
         image = Image.open(stream)
-        results = model.predict(image)
+        pixelArray = img_to_array(image) 
+        pixelArray = pixelArray.reshape((1,) + x.shape)
+        results = model.predict(pixelArray)
         print("Camera Results Frame "+ str(i) + ":", results)
         # Turn Wheels
         # pwm.set_pwm(0, 0, setDirection(results))
@@ -95,7 +97,7 @@ with picamera.PiCamera() as camera:
             outputs = [io.BytesIO() for i in range(capturesPerCycle)]
             startTime = time.time()
             # Capture Image
-            camera.capture_sequence(processImages(), 'jpg', use_video_port=True)
+            camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
             print("Time Taken: ", endTime - startTime)
             print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")

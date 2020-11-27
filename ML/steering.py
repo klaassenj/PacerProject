@@ -75,7 +75,7 @@ def processImages():
         stream.seek(0)
         image = Image.open(stream)
         pixelArray = img_to_array(image) 
-        pixelArray = pixelArray.reshape((1,) + x.shape)
+        pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
         results = model.predict(pixelArray)
         print("Camera Results Frame "+ str(i) + ":", results)
         # Turn Wheels

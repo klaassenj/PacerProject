@@ -22,9 +22,9 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-# sess = tf.Session()
-# graph = tf.get_default_graph()
-# set_session(sess)
+sess = tf.Session()
+graph = tf.get_default_graph()
+set_session(sess)
 
 
 

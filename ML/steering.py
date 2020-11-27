@@ -16,15 +16,15 @@ import numpy as np
 import random
 import io
 import time
-import picamera
+
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-sess = tf.Session()
-graph = tf.get_default_graph()
-set_session(sess)
+# sess = tf.Session()
+# graph = tf.get_default_graph()
+# set_session(sess)
 
 
 
@@ -70,7 +70,7 @@ model.compile(loss='binary_crossentropy',
 # Load Model
 model.load_weights("weights")
 
-converter = tf.lite.TFLiteConverter.from_keras_model_file("steeringModel")
+converter = tf.lite.TFLiteConverter.from_saved_model("steeringModel")
 tflite_model = converter.convert()
 
 
@@ -111,6 +111,7 @@ def processImages():
         print("-------------------")
     numCycles += 1
 
+import picamera
 with picamera.PiCamera() as camera:
     print("Initialize Camera")
     camera.resolution = (imageWidth, imageHeight)

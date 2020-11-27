@@ -113,7 +113,7 @@ history = model.fit_generator(
       verbose=2)
 
 model.save_weights("weights")
-tf.keras.models.save_model(
+tf.compat.v1.keras.models.save_model(
     model, "steeringModel", overwrite=True, include_optimizer=True, save_format=None,
     signatures=None
 )

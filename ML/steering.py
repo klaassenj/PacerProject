@@ -81,21 +81,22 @@ def processImages():
     global sess
     global graph
     stream = io.BytesIO()
-    with graph.as_default():
-        set_session(sess)
-        for i in range(capturesPerCycle):
-            yield stream
-            stream.seek(0)
-            image = Image.open(stream)
-            pixelArray = img_to_array(image) 
-            pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+    
+    for i in range(capturesPerCycle):
+        yield stream
+        stream.seek(0)
+        image = Image.open(stream)
+        pixelArray = img_to_array(image) 
+        pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+        with graph.as_default():
+            set_session(sess)
             results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
-            # Turn Wheels
-            # pwm.set_pwm(0, 0, setDirection(results))
-            stream.seek(0)
-            stream.truncate()
-        numCycles += 1
+        # Turn Wheels
+        # pwm.set_pwm(0, 0, setDirection(results))
+        stream.seek(0)
+        stream.truncate()
+    numCycles += 1
 
 with picamera.PiCamera() as camera:
     print("Initialize Camera")

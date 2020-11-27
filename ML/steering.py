@@ -3,7 +3,6 @@ import os
 import zipfile
 import time
 import tensorflow as tf
-import tflite_runtime.interpreter as tflite
 from tensorflow import keras
 from tensorflow.keras import optimizers
 from tensorflow.keras.optimizers import schedules
@@ -71,7 +70,7 @@ model.compile(loss='binary_crossentropy',
 # Load Model
 model.load_weights("weights")
 
-converter = tflite.TFLiteConverter.from_keras_model(model)
+converter = tf.lite.TFLiteConverter.from_keras_model_file("steeringModel")
 tflite_model = converter.convert()
 
 

@@ -1,9 +1,10 @@
 import os
 import zipfile
 import time
+import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+# import matplotlib.pyplot as plt
+# import matplotlib.image as mpimg
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np
@@ -112,6 +113,10 @@ history = model.fit_generator(
       verbose=2)
 
 model.save_weights("weights")
+tf.keras.models.save_model(
+    model, "steeringModel", overwrite=True, include_optimizer=True, save_format=None,
+    signatures=None
+)
 
 uncompiledModel = Model(img_input, output)
 uncompiledModel.load_weights("weights")
@@ -181,15 +186,15 @@ val_loss = history.history['val_loss']
 epochs = range(len(acc))
 
 # Plot training and validation accuracy per epoch
-plt.plot(epochs, acc)
-plt.plot(epochs, val_acc)
-plt.title('Training and validation accuracy')
+# plt.plot(epochs, acc)
+# plt.plot(epochs, val_acc)
+# plt.title('Training and validation accuracy')
 
-plt.figure()
+# plt.figure()
 
-# Plot training and validation loss per epoch
-plt.plot(epochs, loss)
-plt.plot(epochs, val_loss)
-plt.title('Training and validation loss')
+# # Plot training and validation loss per epoch
+# plt.plot(epochs, loss)
+# plt.plot(epochs, val_loss)
+# plt.title('Training and validation loss')
 
-plt.show()
+# plt.show()

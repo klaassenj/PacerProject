@@ -70,9 +70,6 @@ model.compile(loss='binary_crossentropy',
 # Load Model
 model.load_weights("weights")
 
-converter = tf.lite.TFLiteConverter.from_saved_model("steeringModel")
-tflite_model = converter.convert()
-
 
 # Model is Ready
 
@@ -98,7 +95,7 @@ def processImages():
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
-            results = tflite_model.predict(pixelArray)
+            results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         

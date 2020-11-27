@@ -23,9 +23,10 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Camera
 numCycles = 0
-imageRatio = 480 / 640
-imageWidth = 640
+imageRatio = 1
+imageWidth = 100
 imageHeight = int(imageWidth * imageRatio)
+image_size = imageWidth
 capturesPerCycle = 40
 cameraFramerate = 80
 

@@ -2,6 +2,7 @@
 import os
 import zipfile
 import time
+import tensorflow
 from tensorflow import keras
 from tensorflow.keras import optimizers
 from tensorflow.keras.optimizers import schedules
@@ -18,6 +19,8 @@ from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+# Initialize Tensor Graph
+graph = tensorflow.get_default_graph()
 
 
 # Initalize Variables
@@ -69,6 +72,8 @@ def setDirection(results):
 # Define Camera Function
 def processImages():
     global numCycles
+    global model
+    global graph
     stream = io.BytesIO()
     for i in range(capturesPerCycle):
         yield stream
@@ -76,8 +81,10 @@ def processImages():
         image = Image.open(stream)
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
-        results = model.predict(pixelArray)
-        print("Camera Results Frame "+ str(i) + ":", results)
+        print("Predicting the Future...")
+        with graph.as_default():
+            results = model.predict(pixelArray)
+            print("Camera Results Frame "+ str(i) + ":", results)
         # Turn Wheels
         # pwm.set_pwm(0, 0, setDirection(results))
         stream.seek(0)

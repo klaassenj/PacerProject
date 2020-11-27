@@ -84,18 +84,28 @@ def processImages():
     
     for i in range(capturesPerCycle):
         yield stream
+        startTime = time.time()
         stream.seek(0)
         image = Image.open(stream)
+        openImageTime = time.time()
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+        convertTime = time.time()
         with graph.as_default():
             set_session(sess)
             results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
+        predictTime = time.time()
+        
         # Turn Wheels
         # pwm.set_pwm(0, 0, setDirection(results))
         stream.seek(0)
         stream.truncate()
+        truncateTime = time.time()
+        print("Seek and Open Image:", openImageTime - startTime)
+        print("Convert Image to Pixel Array:", convertTime - openImageTime)
+        print("Predict from Image:", predictTime - convertTime)
+        print("Go to next Image:", truncateTime - predictTime)
     numCycles += 1
 
 with picamera.PiCamera() as camera:

@@ -68,7 +68,12 @@ model.compile(loss='binary_crossentropy',
               optimizer=RMSprop(lr=0.001),
               metrics=['acc'])
 # Load Model
-model.load_weights("weights")              
+model.load_weights("weights")
+
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+
 # Model is Ready
 
 def setDirection(results):
@@ -78,9 +83,11 @@ def setDirection(results):
 def processImages():
     global numCycles
     global model
+    global tflite_model
     global sess
     global graph
     stream = io.BytesIO()
+    
     
     for i in range(capturesPerCycle):
         yield stream
@@ -91,7 +98,7 @@ def processImages():
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray)
+            results = tflite_model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         
@@ -123,7 +130,7 @@ with picamera.PiCamera() as camera:
             startTime = time.time()
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
-            print(str(capturesPerCycle) + " images at ", capturesPerCycle / (capturesTime - startTime), "FPS")
+            print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
             print("Camera Captures in:", endTime - startTime)
             time.sleep(0.5)
     except KeyboardInterrupt:

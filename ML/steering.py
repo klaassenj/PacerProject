@@ -2,12 +2,14 @@
 import os
 import zipfile
 import time
-import tensorflow
+import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import optimizers
 from tensorflow.keras.optimizers import schedules
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from tensorflow.python.keras.backend import set_session
+from tensorflow.python.keras.models import load_model
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np
@@ -19,8 +21,11 @@ from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-# Initialize Tensor Graph
-graph = tensorflow.get_default_graph()
+
+sess = tf.Session()
+graph = tf.get_default_graph()
+set_session(sess)
+
 
 
 # Initalize Variables
@@ -73,6 +78,7 @@ def setDirection(results):
 def processImages():
     global numCycles
     global model
+    global sess
     global graph
     stream = io.BytesIO()
     for i in range(capturesPerCycle):
@@ -83,6 +89,7 @@ def processImages():
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
         print("Predicting the Future...")
         with graph.as_default():
+            set_session(sess)
             results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
         # Turn Wheels

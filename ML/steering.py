@@ -6,6 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import optimizers
 from tensorflow.keras.optimizers import schedules
 from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np

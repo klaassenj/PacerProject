@@ -16,7 +16,6 @@ import numpy as np
 import random
 import io
 import time
-
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -52,14 +51,14 @@ currentDirection = servoMiddle
 
 # Load ML CNN Model
 img_input = layers.Input(shape=(image_size, image_size, 3))
-x = layers.Conv2D(16, 3, activation='relu')(img_input)
+x = layers.Conv2D(8, 3, activation='relu')(img_input)
+x = layers.MaxPooling2D(2)(x)
+x = layers.Conv2D(16, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
 x = layers.Conv2D(32, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
-x = layers.Conv2D(64, 3, activation='relu')(x)
-x = layers.MaxPooling2D(2)(x)
 x = layers.Flatten()(x)
-x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(64, activation='relu')(x)
 output = layers.Dense(1, activation='sigmoid')(x)
 model = Model(img_input, output)
 model.summary()
@@ -95,7 +94,7 @@ def processImages():
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray, workers=2, use_multiprocessing=True)
+            results = model.predict(pixelArray)
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         

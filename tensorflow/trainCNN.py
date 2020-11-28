@@ -14,7 +14,7 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 base_dir = './data'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
-image_size = 400
+image_size = 100
 
 # Directory with our training left pictures
 train_lefts_dir = os.path.join(train_dir, 'left')

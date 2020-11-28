@@ -136,11 +136,9 @@ def processImages():
         with graph.as_default():
             set_session(sess)
             results = model(pixelArray, training=False)
-            numbers = sess.run(tf.gather(results, 0))
-            print(numbers)
-            leftComponent = int(int(numbers[1] * 100) / 100)
-            rightComponent = int(int(numbers[0] * 100) / 100)
-            straightComponent = int(int(numbers[2] * 100) / 100)
+            leftComponent = int(int(results[1] * 100) / 100)
+            rightComponent = int(int(results[0] * 100) / 100)
+            straightComponent = int(int(results[2] * 100) / 100)
             prediction = 'Straight'
             if(leftComponent > straightComponent):
                 prediction = 'Left'

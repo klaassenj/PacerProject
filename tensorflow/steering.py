@@ -135,10 +135,20 @@ def processImages():
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray).eval()
-            leftComponent = int(int(results[1] * 100) / 100)
-            rightComponent = int(int(results[0] * 100) / 100)
-            straightComponent = int(int(results[2] * 100) / 100)
+            results = model.predict(pixelArray)
+            string = str(results)
+            print(string)
+            strings = string.split('[[')
+            print(strings)
+            strings = strings[1].split(']]')
+            print(strings)
+            strings = strings[0].split()
+            print(strings)
+            numbers = [float(x) for x in strings]
+            print(numbers)
+            leftComponent = int(int(numbers[1] * 100) / 100)
+            rightComponent = int(int(numbers[0] * 100) / 100)
+            straightComponent = int(int(numbers[2] * 100) / 100)
             prediction = 'Straight'
             if(leftComponent > straightComponent):
                 prediction = 'Left'

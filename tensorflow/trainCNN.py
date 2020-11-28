@@ -154,7 +154,15 @@ for i in range(10):
     start = time.time()
     results = model(x, training=False)
     timeTaken = time.time() - start
-    print((results[0])[0])
+    string = str(results)
+    print(string)
+    strings = string.split('[[')
+    print(strings)
+    strings = strings[1].split(']]')
+    print(strings)
+    strings = strings[0].split()
+    print(strings)
+    print([float(x) for x in strings])
     print(results, timeTaken)
 
 

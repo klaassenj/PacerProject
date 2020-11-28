@@ -137,15 +137,10 @@ def processImages():
             set_session(sess)
             results = model.predict(pixelArray)
             string = str(results)
-            print(string)
             strings = string.split('[[')
-            print(strings)
             strings = strings[1].split(']]')
-            print(strings)
             strings = strings[0].split()
-            print(strings)
             numbers = [float(x) for x in strings]
-            print(numbers)
             leftComponent = int(int(numbers[1] * 100) / 100)
             rightComponent = int(int(numbers[0] * 100) / 100)
             straightComponent = int(int(numbers[2] * 100) / 100)
@@ -159,7 +154,7 @@ def processImages():
             if rightComponent != 0 and straightComponent != 0:
                 prediction = 'Straight-Right'
             
-            print("Camera Results Frame "+ str(i) + ":", results)
+            print("Camera Results Frame "+ str(i) + ":", numbers)
         predictTime = time.time()
         
         # Set Direction

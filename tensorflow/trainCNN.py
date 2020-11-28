@@ -11,10 +11,10 @@ import numpy as np
 import random
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-base_dir = '.'
+base_dir = './data'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
-image_size = 100
+image_size = 400
 
 # Directory with our training left pictures
 train_lefts_dir = os.path.join(train_dir, 'left')
@@ -47,24 +47,24 @@ img_input = layers.Input(shape=(image_size, image_size, 3))
 
 # First convolution extracts 16 filters that are 3x3
 # Convolution is followed by max-pooling layer with a 2x2 window
-x = layers.Conv2D(16, 3, activation='relu')(img_input)
+x = layers.Conv2D(8, 3, activation='relu')(img_input)
 x = layers.MaxPooling2D(2)(x)
 
 # Second convolution extracts 32 filters that are 3x3
 # Convolution is followed by max-pooling layer with a 2x2 window
-x = layers.Conv2D(32, 3, activation='relu')(x)
+x = layers.Conv2D(16, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
 
 # Third convolution extracts 64 filters that are 3x3
 # Convolution is followed by max-pooling layer with a 2x2 window
-x = layers.Conv2D(64, 3, activation='relu')(x)
+x = layers.Conv2D(32, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
 
 # Flatten feature map to a 1-dim tensor so we can add fully connected layers
 x = layers.Flatten()(x)
 
 # Create a fully connected layer with ReLU activation and 512 hidden units
-x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(64, activation='relu')(x)
 
 # Create output layer with a single node and sigmoid activation
 output = layers.Dense(1, activation='sigmoid')(x)
@@ -119,7 +119,6 @@ tf.compat.v1.keras.models.save_model(
 )
 
 uncompiledModel = Model(img_input, output)
-uncompiledModel.load_weights("weights")
 
 # LEFT --------------
 

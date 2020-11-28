@@ -95,7 +95,7 @@ def processImages():
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray)
+            results = model.predict(pixelArray, workers=2, use_multiprocessing=True)
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         

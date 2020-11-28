@@ -19,6 +19,31 @@ import time
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
+from __future__ import division
+import curses
+import time
+# Import the PCA9685 module.
+import Adafruit_PCA9685
+# Import Pigpio for reading IR
+import thread
+import sys
+
+pwm = Adafruit_PCA9685.PCA9685()
+servoMin = 220
+servoMax = 400
+servoMiddle = (servoMax + servoMin) // 2
+pulseFrequency = 50 # ESC takes 50 Hz
+motorMin = 300
+motorMax = 400
+speedOptions = [(x * 15 + 320) for x in range(0, 10)]
+resp = 2
+
+currentThrottle = 0
+
+pwm.set_pwm_freq(pulseFrequency)
+ 
+def getStop():
+    return motorMin
 
 
 sess = tf.Session()
@@ -47,7 +72,9 @@ servoMax = 400
 pulseFrequency = 50 # ESC takes 50 Hz
 currentThrottle = 0
 servoMiddle = (servoMax + servoMin) // 2
-currentDirection = servoMiddle
+directionLeft = (servoMin + servoMiddle) // 2
+directionRight = (servoMax + servoMiddle) // 2
+
 
 # Load ML CNN Model
 img_input = layers.Input(shape=(image_size, image_size, 3))
@@ -82,15 +109,18 @@ def processImages():
     global tflite_model
     global sess
     global graph
+    global pwm
     stream = io.BytesIO()
     
     
     for i in range(capturesPerCycle):
         yield stream
+        # Load Image from Camera
         stream.seek(0)
         image = Image.open(stream)
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+        # Predict with Model
         startTime = time.time()
         with graph.as_default():
             set_session(sess)
@@ -98,12 +128,19 @@ def processImages():
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         
-        # Turn Wheels
-        # pwm.set_pwm(0, 0, setDirection(results))
+        # Turn Steering Servo
+        direction = servoMiddle
+        if(results[0] == 0):
+            direction = directionLeft
+        else:
+            direction = directionRight
+        pwm.set_pwm(0, 0, int(direction))
+        pwmTime = time.time()
         stream.seek(0)
         stream.truncate()
         print("-------------------")
         print("Predict from Image:", predictTime - startTime)
+        print("Turn Servo:", pwmTime - predictTime)
         print("-------------------")
     numCycles += 1
 

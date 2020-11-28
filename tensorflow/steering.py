@@ -136,24 +136,11 @@ def processImages():
         with graph.as_default():
             set_session(sess)
             results = model(pixelArray, training=False)
-            leftComponent = int(int(results[1] * 100) / 100)
-            rightComponent = int(int(results[0] * 100) / 100)
-            straightComponent = int(int(results[2] * 100) / 100)
-            prediction = 'Straight'
-            if(leftComponent > straightComponent):
-                prediction = 'Left'
-            if(rightComponent > leftComponent):
-                prediction = 'Right'
-            if leftComponent != 0 and straightComponent != 0:
-                prediction = 'Straight-Left'
-            if rightComponent != 0 and straightComponent != 0:
-                prediction = 'Straight-Right'
-            
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         
         # Set Direction
-        direction = processPrediction(prediction)
+        direction = servoMiddle
         # Turn Steering Servo
         pwm.set_pwm(0, 0, int(direction))
         pwmTime = time.time()

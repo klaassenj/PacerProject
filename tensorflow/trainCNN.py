@@ -79,7 +79,7 @@ x = layers.Flatten()(x)
 x = layers.Dense(64, activation='relu')(x)
 
 # Create the output layer with numclasses nodes
-output = layers.Dense(3, activation='softmax')(x)
+output = layers.Dense(3, activation='relu')(x)
 
 # Create model:
 # input = input feature map

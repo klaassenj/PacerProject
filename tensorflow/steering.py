@@ -71,6 +71,20 @@ currentThrottle = 0
 servoMiddle = (servoMax + servoMin) // 2
 directionLeft = (servoMin + servoMiddle) // 2
 directionRight = (servoMax + servoMiddle) // 2
+directionMiddleLeft = (directionLeft + servoMiddle) // 2
+directionMiddleRight = (directionRight + servoMiddle) // 2
+
+def processPrediction(predictionString):
+    if predictionString == 'Straight':
+        return servoMiddle
+    if predictionString == 'Left':
+        return directionLeft
+    if predictionString == 'Right':
+        return directionRight
+    if predictionString == 'Straight-Left':
+        return directionMiddleLeft
+    if predictionString == 'Straight-Right':
+        return directionMiddleRight
 
 
 # Load ML CNN Model
@@ -124,15 +138,25 @@ def processImages():
             results = model(pixelArray, training=False)
             numbers = sess.run(tf.gather(results, 0))
             print(numbers)
+            leftComponent = numbers[1]
+            rightComponent = numbers[0]
+            straightComponent = numbers[2]
+            prediction = 'Straight'
+            if(leftComponent > straightComponent):
+                prediction = 'Left'
+            if(rightComponent > leftComponent):
+                prediction = 'Right'
+            if leftComponent != 0 and straightComponent != 0:
+                prediction = 'Straight-Left'
+            if rightComponent != 0 and straightComponent != 0:
+                prediction = 'Straight-Right'
+            
             print("Camera Results Frame "+ str(i) + ":", results)
         predictTime = time.time()
         
+        # Set Direction
+        direction = processPrediction(prediction)
         # Turn Steering Servo
-        direction = servoMiddle
-        if(results[0] == 0):
-            direction = directionLeft
-        else:
-            direction = directionRight
         pwm.set_pwm(0, 0, int(direction))
         pwmTime = time.time()
         stream.seek(0)

@@ -97,7 +97,7 @@ x = layers.Conv2D(32, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
 x = layers.Flatten()(x)
 x = layers.Dense(64, activation='relu')(x)
-output = layers.Dense(3, activation='relu')(x)
+output = layers.Dense(3, activation='softmax')(x)
 model = Model(img_input, output)
 model.summary()
 # Compile Model

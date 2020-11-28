@@ -79,7 +79,7 @@ x = layers.Flatten()(x)
 x = layers.Dense(64, activation='relu')(x)
 
 # Create the output layer with numclasses nodes
-output = layers.Dense(3, activation='relu')(x)
+output = layers.Dense(3, activation='softmax')(x)
 
 # Create model:
 # input = input feature map
@@ -128,11 +128,14 @@ model.save_weights("weights")
 
 uncompiledModel = Model(img_input, output)
 
-# LEFT --------------
 
 # Let's prepare a random input image of a left or right from the training set.
 left_img_files = [os.path.join(train_lefts_dir, f) for f in train_left_fnames]
 right_img_files = [os.path.join(train_rights_dir, f) for f in train_right_fnames]
+straight_img_files = [os.path.join(train_straights_dir, f) for f in train_straight_fnames]
+
+# LEFT --------------
+
 img_path = random.choice(left_img_files)
 img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
 x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
@@ -151,8 +154,7 @@ for i in range(10):
     start = time.time()
     results = model(x, training=False)
     timeTaken = time.time() - start
-    numbers = sess.run(tf.gather(results, 0))
-    print(numbers)
+    print((results[0])[0])
     print(results, timeTaken)
 
 
@@ -165,19 +167,41 @@ x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
 # Rescale by 1/255
 x /= 255
 
-
-
-print("Uncompiled")
-for i in range(10):
-    start = time.time()
-    results = uncompiledModel.predict(x)
-    timeTaken = time.time() - start
-    print(results, timeTaken)
+# print("Uncompiled")
+# for i in range(10):
+#     start = time.time()
+#     results = uncompiledModel.predict(x)
+#     timeTaken = time.time() - start
+#     print(results, timeTaken)
 
 print("Compiled")
 for i in range(10):
     start = time.time()
-    results = model.predict(x)
+    results = model(x, training=False)
+    timeTaken = time.time() - start
+    print(results, timeTaken)
+
+
+# STRAIGHT ---------------------
+
+img_path = random.choice(straight_img_files)
+img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+# Rescale by 1/255
+x /= 255
+
+# print("Uncompiled")
+# for i in range(10):
+#     start = time.time()
+#     results = uncompiledModel.predict(x)
+#     timeTaken = time.time() - start
+#     print(results, timeTaken)
+
+print("Compiled")
+for i in range(10):
+    start = time.time()
+    results = model(x, training=False)
     timeTaken = time.time() - start
     print(results, timeTaken)
 

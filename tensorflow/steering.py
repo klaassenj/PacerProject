@@ -1,3 +1,4 @@
+from __future__ import division
 # Import Everything
 import os
 import zipfile
@@ -19,13 +20,9 @@ import time
 from PIL import Image
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-from __future__ import division
-import curses
 import time
 # Import the PCA9685 module.
 import Adafruit_PCA9685
-# Import Pigpio for reading IR
-import thread
 import sys
 
 pwm = Adafruit_PCA9685.PCA9685()

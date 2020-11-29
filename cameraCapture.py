@@ -8,7 +8,7 @@ numCycles = 0
 
 imageRatio = 480 / 640
 imageWidth = 640
-imageHeight = int(imageWidth * imageRatio)
+imageHeight = 480
 capturesPerCycle = 40
 
 def processImages():
@@ -18,7 +18,7 @@ def processImages():
         yield stream
         stream.seek(0)
         image = Image.open(stream)
-        image.save('trackData/frame' + str(numCycles) + '--' + str(i), 'jpeg')
+        image.save('indoors/frame' + str(numCycles) + '--' + str(i), 'jpeg')
         stream.seek(0)
         stream.truncate()
     numCycles += 1

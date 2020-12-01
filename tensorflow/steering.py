@@ -192,6 +192,5 @@ with picamera.PiCamera() as camera:
             endTime = time.time()
             print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
             print("Camera Captures in:", endTime - startTime)
-            time.sleep(0.5)
     except KeyboardInterrupt:
         print("Completed")

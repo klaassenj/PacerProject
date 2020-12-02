@@ -71,6 +71,20 @@ currentThrottle = 0
 servoMiddle = (servoMax + servoMin) // 2
 directionLeft = (servoMin + servoMiddle) // 2
 directionRight = (servoMax + servoMiddle) // 2
+directionMiddleLeft = (directionLeft + servoMiddle) // 2
+directionMiddleRight = (directionRight + servoMiddle) // 2
+
+def processPrediction(predictionString):
+    if predictionString == 'Straight':
+        return servoMiddle
+    if predictionString == 'Left':
+        return directionLeft
+    if predictionString == 'Right':
+        return directionRight
+    if predictionString == 'Straight-Left':
+        return directionMiddleLeft
+    if predictionString == 'Straight-Right':
+        return directionMiddleRight
 
 
 # Load ML CNN Model
@@ -83,7 +97,7 @@ x = layers.Conv2D(32, 3, activation='relu')(x)
 x = layers.MaxPooling2D(2)(x)
 x = layers.Flatten()(x)
 x = layers.Dense(64, activation='relu')(x)
-output = layers.Dense(1, activation='sigmoid')(x)
+output = layers.Dense(3, activation='relu')(x)
 model = Model(img_input, output)
 model.summary()
 # Compile Model
@@ -91,7 +105,7 @@ model.compile(loss='binary_crossentropy',
               optimizer=RMSprop(lr=0.001),
               metrics=['acc'])
 # Load Model
-model.load_weights("weights")
+model.load_weights("weightsV1/weightsV1")
 
 
 # Model is Ready
@@ -122,15 +136,30 @@ def processImages():
         with graph.as_default():
             set_session(sess)
             results = model.predict(pixelArray)
-            print("Camera Results Frame "+ str(i) + ":", results)
+            string = str(results)
+            strings = string.split('[[')
+            strings = strings[1].split(']]')
+            strings = strings[0].split()
+            numbers = [float(x) for x in strings]
+            leftComponent = int(int(numbers[1] * 100) / 100)
+            rightComponent = int(int(numbers[0] * 100) / 100)
+            straightComponent = int(int(numbers[2] * 100) / 100)
+            prediction = 'Straight'
+            if(leftComponent > straightComponent):
+                prediction = 'Left'
+            if(rightComponent > leftComponent):
+                prediction = 'Right'
+            if leftComponent != 0 and straightComponent != 0:
+                prediction = 'Straight-Left'
+            if rightComponent != 0 and straightComponent != 0:
+                prediction = 'Straight-Right'
+            
+            print("Camera Results Frame "+ str(i) + ":", numbers)
         predictTime = time.time()
         
+        # Set Direction
+        direction = processPrediction(prediction)
         # Turn Steering Servo
-        direction = servoMiddle
-        if(results[0] == 0):
-            direction = directionLeft
-        else:
-            direction = directionRight
         pwm.set_pwm(0, 0, int(direction))
         pwmTime = time.time()
         stream.seek(0)
@@ -163,6 +192,5 @@ with picamera.PiCamera() as camera:
             endTime = time.time()
             print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
             print("Camera Captures in:", endTime - startTime)
-            time.sleep(0.5)
     except KeyboardInterrupt:
         print("Completed")

@@ -3,30 +3,34 @@ import zipfile
 import time
 import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
-# import matplotlib.pyplot as plt
-# import matplotlib.image as mpimg
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-base_dir = './data'
+base_dir = './MLData'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
 image_size = 100
 
 # Directory with our training left pictures
-train_lefts_dir = os.path.join(train_dir, 'left')
+train_lefts_dir = os.path.join(train_dir, 'Left')
 
 # Directory with our training right pictures
-train_rights_dir = os.path.join(train_dir, 'right')
+train_rights_dir = os.path.join(train_dir, 'Right')
+
+# Directory with our training straight pictures
+train_straights_dir = os.path.join(train_dir, 'Straight')
 
 # Directory with our validation left pictures
-validation_lefts_dir = os.path.join(validation_dir, 'left')
+validation_lefts_dir = os.path.join(validation_dir, 'Left')
 
 # Directory with our validation right pictures
-validation_rights_dir = os.path.join(validation_dir, 'right')
+validation_rights_dir = os.path.join(validation_dir, 'Right')
+
+# Directory with our validation straight pictures
+validation_straights_dir = os.path.join(validation_dir, 'Straight')
 
 train_left_fnames = os.listdir(train_lefts_dir)
 print(train_left_fnames[:10])
@@ -35,10 +39,16 @@ train_right_fnames = os.listdir(train_rights_dir)
 train_right_fnames.sort()
 print(train_right_fnames[:10])
 
+train_straight_fnames = os.listdir(train_straights_dir)
+train_straight_fnames.sort()
+print(train_straight_fnames[:10])
+
 print('total training left images:', len(os.listdir(train_lefts_dir)))
 print('total training right images:', len(os.listdir(train_rights_dir)))
+print('total training straight images:', len(os.listdir(train_straights_dir)))
 print('total validation left images:', len(os.listdir(validation_lefts_dir)))
 print('total validation right images:', len(os.listdir(validation_rights_dir)))
+print('total training straight images:', len(os.listdir(validation_straights_dir)))
 
 
 # Our input feature map is 150x150x3: 150x150 for the image pixels, and 3 for
@@ -66,8 +76,8 @@ x = layers.Flatten()(x)
 # Create a fully connected layer with ReLU activation and 512 hidden units
 x = layers.Dense(64, activation='relu')(x)
 
-# Create output layer with a single node and sigmoid activation
-output = layers.Dense(1, activation='sigmoid')(x)
+# Create the output layer with numclasses nodes
+output = layers.Dense(3, activation='softmax')(x)
 
 # Create model:
 # input = input feature map
@@ -79,7 +89,7 @@ model.summary()
 
 
 
-model.compile(loss='binary_crossentropy',
+model.compile(loss='categorical_crossentropy',
               optimizer=RMSprop(lr=0.001),
               metrics=['acc'])
 
@@ -92,82 +102,88 @@ val_datagen = ImageDataGenerator(rescale=1./255)
 # Flow training images in batches of 20 using train_datagen generator
 train_generator = train_datagen.flow_from_directory(
         train_dir,  # This is the source directory for training images
-        target_size=(image_size, image_size),  # All images will be resized to 150x150
-        batch_size=5,
+        target_size=(image_size, image_size),  # All images will be resized to image_size
+        batch_size=128,
         # Since we use binary_crossentropy loss, we need binary labels
-        class_mode='binary')
+        class_mode='categorical')
 
 # Flow validation images in batches of 20 using val_datagen generator
 validation_generator = val_datagen.flow_from_directory(
         validation_dir,
         target_size=(image_size, image_size),
-        batch_size=5,
-        class_mode='binary')
+        batch_size=64,
+        class_mode='categorical')
 
 history = model.fit_generator(
       train_generator,
       steps_per_epoch=100,  # 2000 images = batch_size * steps
-      epochs=15,
+      epochs=25,
       validation_data=validation_generator,
       validation_steps=50,  # 1000 images = batch_size * steps
       verbose=2)
 
-model.save_weights("weights")
-tf.compat.v1.keras.models.save_model(
-    model, "steeringModel", overwrite=True, include_optimizer=True, save_format=None,
-    signatures=None
-)
+model.save_weights("weightsV2/weightsV2")
 
 uncompiledModel = Model(img_input, output)
 
-# LEFT --------------
 
 # Let's prepare a random input image of a left or right from the training set.
 left_img_files = [os.path.join(train_lefts_dir, f) for f in train_left_fnames]
 right_img_files = [os.path.join(train_rights_dir, f) for f in train_right_fnames]
-img_path = random.choice(left_img_files)
-img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
-x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-x /= 255
+straight_img_files = [os.path.join(train_straights_dir, f) for f in train_straight_fnames]
 
-print("Uncompiled")
-for i in range(10):
-    start = time.time()
-    results = uncompiledModel.predict(x)
-    timeTaken = time.time() - start
-    print(results, timeTaken)
+# LEFT --------------
     
 print("Compiled")
 for i in range(10):
+    img_path = random.choice(left_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    x /= 255
     start = time.time()
-    results = model.predict(x)
+    results = model(x, training=False)
     timeTaken = time.time() - start
+    string = str(results)
+    print(string)
+    strings = string.split('[[')
+    print(strings)
+    strings = strings[1].split(']]')
+    print(strings)
+    strings = strings[0].split()
+    print(strings)
+    print([float(x) for x in strings])
     print(results, timeTaken)
 
 
 # RIGHT --------------
 
-img_path = random.choice(right_img_files)
-img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
-x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-# Rescale by 1/255
-x /= 255
-
-
-
-print("Uncompiled")
+print("Compiled")
 for i in range(10):
+    img_path = random.choice(right_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    # Rescale by 1/255
+    x /= 255
     start = time.time()
-    results = uncompiledModel.predict(x)
+    results = model(x, training=False)
     timeTaken = time.time() - start
     print(results, timeTaken)
 
+
+# STRAIGHT ---------------------
+
 print("Compiled")
 for i in range(10):
+    img_path = random.choice(straight_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    # Rescale by 1/255
+    x /= 255
     start = time.time()
-    results = model.predict(x)
+    results = model(x, training=False)
     timeTaken = time.time() - start
     print(results, timeTaken)
 
@@ -184,16 +200,18 @@ val_loss = history.history['val_loss']
 # Get number of epochs
 epochs = range(len(acc))
 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 # Plot training and validation accuracy per epoch
-# plt.plot(epochs, acc)
-# plt.plot(epochs, val_acc)
-# plt.title('Training and validation accuracy')
+plt.plot(epochs, acc)
+plt.plot(epochs, val_acc)
+plt.title('Training and validation accuracy')
 
-# plt.figure()
+plt.figure()
 
-# # Plot training and validation loss per epoch
-# plt.plot(epochs, loss)
-# plt.plot(epochs, val_loss)
-# plt.title('Training and validation loss')
+# Plot training and validation loss per epoch
+plt.plot(epochs, loss)
+plt.plot(epochs, val_loss)
+plt.title('Training and validation loss')
 
-# plt.show()
+plt.show()

@@ -18,11 +18,7 @@ def processImages():
         yield stream
         stream.seek(0)
         image = Image.open(stream)
-<<<<<<< HEAD
         image.save('outdoorsSunny/frame' + str(numCycles) + 'split' + str(i) + '.jpeg', 'jpeg')
-=======
-        image.save('indoors/frame' + str(numCycles) + '--' + str(i), 'jpeg')
->>>>>>> 89adafe24c8f24bb3cb10c27ca5ec841e3d5e666
         stream.seek(0)
         stream.truncate()
     numCycles += 1

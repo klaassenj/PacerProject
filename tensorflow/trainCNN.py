@@ -3,36 +3,34 @@ import zipfile
 import time
 import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
-# import matplotlib.pyplot as plt
-# import matplotlib.image as mpimg
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-base_dir = './data'
+base_dir = './MLData'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
 image_size = 100
 
 # Directory with our training left pictures
-train_lefts_dir = os.path.join(train_dir, 'left')
+train_lefts_dir = os.path.join(train_dir, 'Left')
 
 # Directory with our training right pictures
-train_rights_dir = os.path.join(train_dir, 'right')
+train_rights_dir = os.path.join(train_dir, 'Right')
 
 # Directory with our training straight pictures
-train_straights_dir = os.path.join(train_dir, 'straight')
+train_straights_dir = os.path.join(train_dir, 'Straight')
 
 # Directory with our validation left pictures
-validation_lefts_dir = os.path.join(validation_dir, 'left')
+validation_lefts_dir = os.path.join(validation_dir, 'Left')
 
 # Directory with our validation right pictures
-validation_rights_dir = os.path.join(validation_dir, 'right')
+validation_rights_dir = os.path.join(validation_dir, 'Right')
 
 # Directory with our validation straight pictures
-validation_straights_dir = os.path.join(validation_dir, 'straight')
+validation_straights_dir = os.path.join(validation_dir, 'Straight')
 
 train_left_fnames = os.listdir(train_lefts_dir)
 print(train_left_fnames[:10])
@@ -105,7 +103,7 @@ val_datagen = ImageDataGenerator(rescale=1./255)
 train_generator = train_datagen.flow_from_directory(
         train_dir,  # This is the source directory for training images
         target_size=(image_size, image_size),  # All images will be resized to image_size
-        batch_size=5,
+        batch_size=128,
         # Since we use binary_crossentropy loss, we need binary labels
         class_mode='categorical')
 
@@ -113,18 +111,18 @@ train_generator = train_datagen.flow_from_directory(
 validation_generator = val_datagen.flow_from_directory(
         validation_dir,
         target_size=(image_size, image_size),
-        batch_size=5,
+        batch_size=64,
         class_mode='categorical')
 
 history = model.fit_generator(
       train_generator,
       steps_per_epoch=100,  # 2000 images = batch_size * steps
-      epochs=15,
+      epochs=25,
       validation_data=validation_generator,
       validation_steps=50,  # 1000 images = batch_size * steps
       verbose=2)
 
-model.save_weights("weights")
+model.save_weights("weightsV2/weightsV2")
 
 uncompiledModel = Model(img_input, output)
 
@@ -135,22 +133,14 @@ right_img_files = [os.path.join(train_rights_dir, f) for f in train_right_fnames
 straight_img_files = [os.path.join(train_straights_dir, f) for f in train_straight_fnames]
 
 # LEFT --------------
-
-img_path = random.choice(left_img_files)
-img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
-x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-x /= 255
-
-# print("Uncompiled")
-# for i in range(10):
-#     start = time.time()
-#     results = uncompiledModel.predict(x)
-#     timeTaken = time.time() - start
-#     print(results, timeTaken)
     
 print("Compiled")
 for i in range(10):
+    img_path = random.choice(left_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    x /= 255
     start = time.time()
     results = model(x, training=False)
     timeTaken = time.time() - start
@@ -168,22 +158,14 @@ for i in range(10):
 
 # RIGHT --------------
 
-img_path = random.choice(right_img_files)
-img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
-x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-# Rescale by 1/255
-x /= 255
-
-# print("Uncompiled")
-# for i in range(10):
-#     start = time.time()
-#     results = uncompiledModel.predict(x)
-#     timeTaken = time.time() - start
-#     print(results, timeTaken)
-
 print("Compiled")
 for i in range(10):
+    img_path = random.choice(right_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    # Rescale by 1/255
+    x /= 255
     start = time.time()
     results = model(x, training=False)
     timeTaken = time.time() - start
@@ -192,22 +174,14 @@ for i in range(10):
 
 # STRAIGHT ---------------------
 
-img_path = random.choice(straight_img_files)
-img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
-x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-# Rescale by 1/255
-x /= 255
-
-# print("Uncompiled")
-# for i in range(10):
-#     start = time.time()
-#     results = uncompiledModel.predict(x)
-#     timeTaken = time.time() - start
-#     print(results, timeTaken)
-
 print("Compiled")
 for i in range(10):
+    img_path = random.choice(straight_img_files)
+    img = load_img(img_path, target_size=(image_size, image_size))  # this is a PIL image
+    x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
+    x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
+    # Rescale by 1/255
+    x /= 255
     start = time.time()
     results = model(x, training=False)
     timeTaken = time.time() - start
@@ -226,16 +200,18 @@ val_loss = history.history['val_loss']
 # Get number of epochs
 epochs = range(len(acc))
 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 # Plot training and validation accuracy per epoch
-# plt.plot(epochs, acc)
-# plt.plot(epochs, val_acc)
-# plt.title('Training and validation accuracy')
+plt.plot(epochs, acc)
+plt.plot(epochs, val_acc)
+plt.title('Training and validation accuracy')
 
-# plt.figure()
+plt.figure()
 
-# # Plot training and validation loss per epoch
-# plt.plot(epochs, loss)
-# plt.plot(epochs, val_loss)
-# plt.title('Training and validation loss')
+# Plot training and validation loss per epoch
+plt.plot(epochs, loss)
+plt.plot(epochs, val_loss)
+plt.title('Training and validation loss')
 
-# plt.show()
+plt.show()

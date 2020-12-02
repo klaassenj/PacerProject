@@ -105,7 +105,7 @@ model.compile(loss='binary_crossentropy',
               optimizer=RMSprop(lr=0.001),
               metrics=['acc'])
 # Load Model
-model.load_weights("weights")
+model.load_weights("weightsV1/weightsV1")
 
 
 # Model is Ready

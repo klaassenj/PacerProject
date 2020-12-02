@@ -182,6 +182,7 @@ def controlThrottle(pwm, screen, motorMin, motorMax, speedOptions, servoMin, ser
                 pwm.set_pwm(1, 0, currentThrottle)
     finally:
         # shut down cleanly
+        print("Error Occurred.")
         curses.nocbreak(); screen.keypad(0); curses.echo()
         curses.endwin()
         pwm.set_pwm(1, 0, motorMin)
@@ -241,8 +242,6 @@ def processImages():
                 prediction = 'Straight-Left'
             if rightComponent != 0 and straightComponent != 0:
                 prediction = 'Straight-Right'
-            
-            print("Camera Results Frame "+ str(i) + ":", numbers)
         predictTime = time.time()
         
         # Set Direction
@@ -252,10 +251,6 @@ def processImages():
         pwmTime = time.time()
         stream.seek(0)
         stream.truncate()
-        print("-------------------")
-        print("Predict from Image:", predictTime - startTime)
-        print("Turn Servo:", pwmTime - predictTime)
-        print("-------------------")
     numCycles += 1
 
 print("Starting Throttle Thread...")

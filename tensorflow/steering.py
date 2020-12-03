@@ -128,13 +128,14 @@ print("Mapping Keyboard Controls for ESC...")
 
 
 # TODO: Would like to change on keypress instead of on hitting enter
-def getInput():
+def controlMotor():
     global pwm
     global speedOptions
     global preferredSpeed
     numbers = [str(x) for x in range(0, 10)]
-    currentThrottle = 0
-    lastThrottle = 0
+    currentThrottle = motorMin
+    lastThrottle = currentThrottle
+    pwm.set_pwm(1, 0, currentThrottle)
     while True:
         string = input("Set Motor:")
         print(string)
@@ -146,7 +147,7 @@ def getInput():
             currentThrottle = motorMin
         try:
             number = int(string)
-            if number > 320 and number < 500:
+            if number > motorMin and number < motorMax:
                 currentThrottle = number
         except:
             print("Maybe this is a Pace?")
@@ -160,7 +161,7 @@ def getInput():
                 print("I am lost with that...")
         if(currentThrottle != lastThrottle):
             print("Setting New Throttle:", currentThrottle)
-            pwm.set_pwm(currentThrottle)
+            pwm.set_pwm(1, 0, currentThrottle)
         lastThrottle = currentThrottle
 
 
@@ -261,6 +262,10 @@ with picamera.PiCamera() as camera:
     print("Booting Camera...")
     time.sleep(2)
     print("Boot Complete...")
+    try:
+        _thread.start_new_thread(controlMotor)
+    except:
+        print("Thread creation failed")
     print("Starting Main Loop...")
     try:
         while True:

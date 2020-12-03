@@ -153,7 +153,7 @@ def controlMotor(pwm, speedOptions, preferredSpeed):
             try:
                 if(string.endswith('s')):
                     secondsPerLap = float(string[:-1])
-                    metersPerSecond = secondsPerLap / 400
+                    metersPerSecond =  400 / secondsPerLap
                     # Convert from metersPerSecond to Throttle
                     currentThrottle = int(((10 / metersPerSecond) - 19.01929) / -0.04118)
 

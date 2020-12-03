@@ -29,7 +29,6 @@ from __future__ import division
 print("Gathering Libraries...")
 import os
 from pynput import keyboard
-keyboard = Controller()
 import time
 import _thread
 import tensorflow as tf

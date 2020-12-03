@@ -6,7 +6,7 @@ Pi powered Traxxas Slash follows the lines on the track to pace athletes to Pers
 
 ### Components:
 - Raspberry Pi 3 B+
-- Array of IR sensors
+- ~~Array of IR sensors~~  
 - Servo Driver board
 - Traxxas Slash 2WD
 - Long Life RC Car Battery

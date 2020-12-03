@@ -71,7 +71,7 @@ FPS = 30
 print("Initializing Motor & Servo...")
 pwm = Adafruit_PCA9685.PCA9685()
 motorMin = 300
-motorMax = 400
+motorMax = 450
 speedOptions = [(x * 15 + 320) for x in range(0, 10)]
 servoMin = 220
 servoMax = 400
@@ -134,7 +134,7 @@ def controlMotor(pwm, speedOptions, preferredSpeed):
     lastThrottle = currentThrottle
     pwm.set_pwm(1, 0, currentThrottle)
     while True:
-        string = input("Set Motor:")
+        string = input("Set Motor Throttle:")
         print(string)
         if string in numbers:
             currentThrottle = speedOptions[int(string)]
@@ -155,7 +155,7 @@ def controlMotor(pwm, speedOptions, preferredSpeed):
                     secondsPerLap = float(string[:-1])
                     metersPerSecond =  400 / secondsPerLap
                     # Convert from metersPerSecond to Throttle
-                    currentThrottle = int(((10 / metersPerSecond) - 19.01929) / -0.04118)
+                    print("Oops TODO m/s", metersPerSecond)
 
             except:
                 print("I am lost with that...")

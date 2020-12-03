@@ -28,8 +28,7 @@ Wireless Keyboard (You may need to visualize your directory structure if you
 from __future__ import division
 print("Gathering Libraries...")
 import os
-import keyboard
-import zipfile
+from pynput import keyboard
 import time
 import _thread
 import tensorflow as tf
@@ -126,11 +125,31 @@ model.load_weights("weightsV1/weightsV1")
 print("Mapping Keyboard Controls for ESC...")
 
 # Register Keyboard presses
-keyboard.on_press_key('s', lambda _: print("Speed now", motorMin)) #pwm.set_pwm(1, 0, motorMin)
-keyboard.on_press_key('enter', lambda _:print("Speed now", motorMin)) #pwm.set_pwm(1, 0, motorMin)
-keyboard.on_release_key('p', lambda _:print("Speed now", preferredSpeed)) #pwm.set_pwm(1, 0, preferredSpeed)
-for i in range(1, 10):
-    keyboard.on_release_key(str(i), lambda _:print("Speed now", speedOptions[i])) #pwm.set_pwm(1, 0, speedOptions[i])
+
+def on_press(key):
+    global speedOptions
+    numbers = [str(x) for x in range(0, 10)]
+    stop = ['s', 'enter']
+    if key == keyboard.Key.esc:
+        print("Not Listening for Keys Anymore.")
+        pwm.set_pwm(1, 0, motorMin)
+        return False  # stop listener
+    try:
+        k = key.char  # single-char keys
+    except:
+        k = key.name  # other keys
+    print("Received Key:", k)
+    if k in numbers:  # keys of interest
+        # self.keys.append(k)  # store it in global-like variable
+        print("Setting Speed to", speedOptions[k])
+        pwm.set_pwm(1, 0, speedOptions[k])
+    if k in stop:
+        print("Setting Speed to", motorMin)
+        pwm.set_pwm(1, 0, motorMin)
+    time.sleep(0.1)
+
+listener = keyboard.Listener(on_press=on_press)
+listener.start()  # start to listen on a separate thread
 
 
 print("Defining Functions...")
@@ -219,7 +238,6 @@ with picamera.PiCamera() as camera:
                 time.sleep(sleepTime)
     except KeyboardInterrupt:
         print("Cleaning up and Shutting down...")
-        keyboard.unhook_all()
         pwm.set_pwm(1, 0, motorMin)
         pwm.set_pwm(0, 0, servoMiddle)
         time.sleep(1)

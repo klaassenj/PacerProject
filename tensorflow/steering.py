@@ -128,10 +128,7 @@ print("Mapping Keyboard Controls for ESC...")
 
 
 # TODO: Would like to change on keypress instead of on hitting enter
-def controlMotor():
-    global pwm
-    global speedOptions
-    global preferredSpeed
+def controlMotor(pwm, speedOptions, preferredSpeed):
     numbers = [str(x) for x in range(0, 10)]
     currentThrottle = motorMin
     lastThrottle = currentThrottle
@@ -263,7 +260,7 @@ with picamera.PiCamera() as camera:
     time.sleep(2)
     print("Boot Complete...")
     try:
-        _thread.start_new_thread(controlMotor)
+        _thread.start_new_thread(controlMotor, (pwm, speedOptions, preferredSpeed))
     except:
         print("Thread creation failed")
     print("Starting Main Loop...")

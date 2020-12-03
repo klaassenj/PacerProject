@@ -4,6 +4,9 @@
 
 Pi powered Traxxas Slash follows the lines on the track to pace athletes to Personal Bests.
 
+The attached Pi Camera feeds a stream of images to a Image Classification Convolutional Neural Net.
+The Neural Net then decides how to adjust the 2WD Servo to best stay on the lane line.
+
 ### Components:
 - Raspberry Pi 3 B+
 - ~~Array of IR sensors~~  

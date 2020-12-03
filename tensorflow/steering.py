@@ -126,11 +126,11 @@ model.load_weights("weightsV1/weightsV1")
 print("Mapping Keyboard Controls for ESC...")
 
 # Register Keyboard presses
-keyboard.on_press_key('s', lambda _:pwm.set_pwm(1, 0, motorMin))
-keyboard.on_press_key('enter', lambda _:pwm.set_pwm(1, 0, motorMin))
-keyboard.on_release_key('p', lambda _:pwm.set_pwm(1, 0, preferredSpeed))
+keyboard.on_press_key('s', lambda _: print("Speed now", motorMin)) #pwm.set_pwm(1, 0, motorMin)
+keyboard.on_press_key('enter', lambda _:print("Speed now", motorMin)) #pwm.set_pwm(1, 0, motorMin)
+keyboard.on_release_key('p', lambda _:print("Speed now", preferredSpeed)) #pwm.set_pwm(1, 0, preferredSpeed)
 for i in range(1, 10):
-    keyboard.on_release_key(str(i), lambda _:pwm.set_pwm(1, 0, speedOptions[i]))
+    keyboard.on_release_key(str(i), lambda _:print("Speed now", speedOptions[i])) #pwm.set_pwm(1, 0, speedOptions[i])
 
 
 print("Defining Functions...")

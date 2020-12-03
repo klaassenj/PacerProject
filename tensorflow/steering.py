@@ -28,7 +28,7 @@ Wireless Keyboard (You may need to visualize your directory structure if you
 from __future__ import division
 print("Gathering Libraries...")
 import os
-from pynput import keyboard
+
 import time
 import _thread
 import tensorflow as tf
@@ -126,30 +126,69 @@ print("Mapping Keyboard Controls for ESC...")
 
 # Register Keyboard presses
 
-def on_press(key):
-    global speedOptions
-    numbers = [str(x) for x in range(0, 10)]
-    stop = ['s', 'enter']
-    if key == keyboard.Key.esc:
-        print("Not Listening for Keys Anymore.")
-        pwm.set_pwm(1, 0, motorMin)
-        return False  # stop listener
-    try:
-        k = key.char  # single-char keys
-    except:
-        k = key.name  # other keys
-    print("Received Key:", k)
-    if k in numbers:  # keys of interest
-        # self.keys.append(k)  # store it in global-like variable
-        print("Setting Speed to", speedOptions[k])
-        pwm.set_pwm(1, 0, speedOptions[k])
-    if k in stop:
-        print("Setting Speed to", motorMin)
-        pwm.set_pwm(1, 0, motorMin)
-    time.sleep(0.1)
 
-listener = keyboard.Listener(on_press=on_press)
-listener.start()  # start to listen on a separate thread
+# TODO: Would like to change on keypress instead of on hitting enter
+def getInput():
+    global pwm
+    global speedOptions
+    global preferredSpeed
+    numbers = [str(x) for x in range(0, 10)]
+    currentThrottle = 0
+    lastThrottle = 0
+    while True:
+        string = input("Set Motor:")
+        print(string)
+        if string in numbers:
+            currentThrottle = speedOptions[string]
+        elif string.lower() == 'p':
+            currentThrottle = preferredSpeed
+        elif string == '':
+            currentThrottle = motorMin
+        try:
+            number = int(string)
+            if number > 320 and number < 500:
+                currentThrottle = number
+        except:
+            print("Maybe this is a Pace?")
+            try:
+                if(string.endswith('s')):
+                    secondsPerLap = float(string[:-1])
+                    metersPerSecond = secondsPerLap / 400
+                    currentThrottle = int(((10 / metersPerSecond) - 19.01929) / -0.04118)
+
+            except:
+                print("I am lost with that...")
+        if(currentThrottle != lastThrottle):
+            print("Setting New Throttle:", currentThrottle)
+            pwm.set_pwm(currentThrottle)
+        lastThrottle = currentThrottle
+
+
+# from pynput import keyboard
+# def on_press(key):
+#     global speedOptions
+#     numbers = [str(x) for x in range(0, 10)]
+#     stop = ['s', 'enter']
+#     if key == keyboard.Key.esc:
+#         print("Not Listening for Keys Anymore.")
+#         pwm.set_pwm(1, 0, motorMin)
+#         return False  # stop listener
+#     try:
+#         k = key.char  # single-char keys
+#     except:
+#         k = key.name  # other keys
+#     print("Received Key:", k)
+#     if k in numbers:  # keys of interest
+#         # self.keys.append(k)  # store it in global-like variable
+#         print("Setting Speed to", speedOptions[k])
+#         pwm.set_pwm(1, 0, speedOptions[k])
+#     if k in stop:
+#         print("Setting Speed to", motorMin)
+#         pwm.set_pwm(1, 0, motorMin)
+#     time.sleep(0.1)
+
+# listener = keyboard.Listener(on_press=on_press)
+# listener.start()  # start to listen on a separate thread
 
 
 print("Defining Functions...")

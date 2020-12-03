@@ -78,6 +78,7 @@ imageHeight = int(imageWidth * imageRatio)
 image_size = imageWidth
 capturesPerCycle = 40
 cameraFramerate = 80
+FPS = 30
 
 
 # Motor & Servo
@@ -268,13 +269,15 @@ with picamera.PiCamera() as camera:
     try:
         while True:
             startTime = time.time()
+            # Initialize Output Holders
             outputs = [io.BytesIO() for i in range(capturesPerCycle)]
             createOutputsTime = time.time()
             
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
-            sleepTime = (1/30) - (endTime - startTime)
-            time.sleep(sleepTime)
+            sleepTime = (1/FPS) - (endTime - startTime)
+            if sleepTime > 0:
+                time.sleep(sleepTime)
     except KeyboardInterrupt:
         print("Run Completed.")

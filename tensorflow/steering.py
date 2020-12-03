@@ -28,7 +28,7 @@ Wireless Keyboard (You may need to visualize your directory structure if you
 from __future__ import division
 print("Gathering Libraries...")
 import os
-from pynput.keyboard import Key, Controller
+from pynput import keyboard
 keyboard = Controller()
 import time
 import _thread
@@ -128,7 +128,6 @@ print("Mapping Keyboard Controls for ESC...")
 # Register Keyboard presses
 
 def on_press(key):
-    global keyboard
     global speedOptions
     numbers = [str(x) for x in range(0, 10)]
     stop = ['s', 'enter']

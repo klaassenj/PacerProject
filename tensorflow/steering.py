@@ -207,7 +207,6 @@ def processPrediction(predictionString):
 
 # Define Camera Function
 def processImages():
-    global numCycles
     global model
     global sess
     global graph
@@ -243,16 +242,14 @@ def processImages():
                 prediction = 'Straight-Left'
             if rightComponent != 0 and straightComponent != 0:
                 prediction = 'Straight-Right'
-        predictTime = time.time()
         
         # Set Direction
         direction = processPrediction(prediction)
         # Turn Steering Servo
         pwm.set_pwm(0, 0, int(direction))
-        pwmTime = time.time()
+        # Reset Stream
         stream.seek(0)
         stream.truncate()
-    numCycles += 1
 
 print("Starting Throttle Thread...")
 try:

@@ -53,22 +53,8 @@ import time
 # Import the PCA9685 module.
 import Adafruit_PCA9685
 import sys
-import curses
 
 # Initalize Variables
-
-# Curses Keyboard Control
-
-# get the curses screen window
-screen = curses.initscr()
-# turn off input echoing
-curses.noecho()
-# respond to keys immediately (don't wait for enter)
-curses.cbreak()
-# map arrow keys to special values
-screen.keypad(True)
-# press Enter to stop 
-
 
 # Camera
 print("Initializing Camera Environment...")
@@ -140,12 +126,12 @@ model.load_weights("weightsV1/weightsV1")
 print("Mapping Keyboard Controls for ESC...")
 
 # Register Keyboard presses
-
 keyboard.on_press_key('s', lambda _:pwm.set_pwm(1, 0, motorMin))
 keyboard.on_press_key('enter', lambda _:pwm.set_pwm(1, 0, motorMin))
 keyboard.on_release_key('p', lambda _:pwm.set_pwm(1, 0, preferredSpeed))
 for i in range(1, 10):
     keyboard.on_release_key(str(i), lambda _:pwm.set_pwm(1, 0, speedOptions[i]))
+
 
 print("Defining Functions...")
 

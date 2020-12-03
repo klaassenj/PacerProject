@@ -269,15 +269,16 @@ with picamera.PiCamera() as camera:
     print("Starting Main Loop...")
     try:
         while True:
-            
+            startTime = time.time()
             outputs = [io.BytesIO() for i in range(capturesPerCycle)]
             createOutputsTime = time.time()
             
             # Capture Image
-            startTime = time.time()
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
             print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
             print("Camera Captures in:", endTime - startTime)
+            sleepTime = (1/30) - (endTime - startTime)
+            time.sleep(sleepTime)
     except KeyboardInterrupt:
         print("Run Completed.")

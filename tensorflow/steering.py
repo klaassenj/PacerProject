@@ -28,6 +28,7 @@ Wireless Keyboard (You may need to visualize your directory structure if you
 from __future__ import division
 print("Gathering Libraries...")
 import os
+import keyboard
 import zipfile
 import time
 import _thread
@@ -136,61 +137,17 @@ print("Loading Model...")
 model.load_weights("weightsV1/weightsV1")
 
 
+print("Mapping Keyboard Controls for ESC...")
+
+# Register Keyboard presses
+
+keyboard.on_press_key('s', lambda _:pwm.set_pwm(1, 0, motorMin))
+keyboard.on_press_key('enter', lambda _:pwm.set_pwm(1, 0, motorMin))
+keyboard.on_release_key('p', lambda _:pwm.set_pwm(1, 0, preferredSpeed))
+for i in range(1, 10):
+    keyboard.on_release_key(str(i), lambda _:pwm.set_pwm(1, 0, speedOptions[i]))
+
 print("Defining Functions...")
-
-def controlThrottle(pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed):
-    currentThrottle = motorMin
-    resp = 2
-    try:
-        while True:
-            char = screen.getch()
-            screen.clear()
-            move = False
-            if char == ord('q'):
-                break
-            elif char == curses.KEY_UP:
-                if currentThrottle < motorMax:
-                    currentThrottle += resp 
-                    move = True
-                screen.addstr(0, 0, 'up   ' + str(currentThrottle))       
-            elif char == curses.KEY_DOWN:
-                if currentThrottle > motorMin:
-                    currentThrottle -= resp 
-                    move = True
-                screen.addstr(0, 0, 'down    ' + str(currentThrottle))
-            elif char == ord('\n'):
-                currentThrottle = motorMin 
-                move = True
-                screen.addstr(0, 0, 'Stoppp    ' + str(currentThrottle))     
-            elif 48 <= char and char <= 57:
-                index = int(char) - 48
-                currentThrottle = speedOptions[index] 
-                move = True
-                screen.addstr(0, 0, 'Speed Set at    ' + str(index) + ":  "+ str(currentThrottle))
-            elif char == ord('p'):
-                if(320 < preferredSpeed < 440):
-                    currentThrottle = preferredSpeed
-                else:
-                    currentThrottle = 340
-                move = True
-                screen.addstr(0, 0, 'Speed Set at    ' + str(currentThrottle))
-            elif char == ord('s'):
-                # stop everything 
-                currentThrottle = motorMin
-                screen.addstr(0, 0, 'up    ' + str(currentThrottle) + ' and down ' + str(current_turn_position))       
-                move = True
-            
-            if move:
-                pwm.set_pwm(1, 0, currentThrottle)
-    finally:
-        # shut down cleanly
-        print("Error Occurred.")
-        curses.nocbreak(); screen.keypad(0); curses.echo()
-        curses.endwin()
-        pwm.set_pwm(1, 0, motorMin)
-        time.sleep(1)
-
-
 
 # Map Predictions to steering output
 def processPrediction(predictionString):
@@ -260,11 +217,6 @@ with picamera.PiCamera() as camera:
     print("Booting Camera...")
     time.sleep(2)
     print("Boot Complete...")
-    print("Starting Throttle Thread...")
-    try:
-        _thread.start_new_thread(controlThrottle, (pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed))
-    except:
-        print("Steering or Kill Switch Thread Failed to Start")
     print("Starting Main Loop...")
     try:
         while True:
@@ -280,4 +232,9 @@ with picamera.PiCamera() as camera:
             if sleepTime > 0:
                 time.sleep(sleepTime)
     except KeyboardInterrupt:
-        print("Run Completed.")
+        print("Cleaning up and Shutting down...")
+        keyboard.unhook_all()
+        pwm.set_pwm(1, 0, motorMin)
+        pwm.set_pwm(0, 0, servoMiddle)
+        time.sleep(1)
+        print("Shutdown.")

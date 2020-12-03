@@ -30,7 +30,7 @@ print("Gathering Libraries...")
 import os
 import zipfile
 import time
-import thread
+import _thread
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import optimizers
@@ -253,7 +253,7 @@ def processImages():
 
 print("Starting Throttle Thread...")
 try:
-    thread.start_new_thread(controlThrottle, (pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed))
+    _thread.start_new_thread(controlThrottle, (pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed))
 except:
     print("Steering or Kill Switch Thread Failed to Start")
 

@@ -221,7 +221,6 @@ def processImages():
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
         # Predict with Model
-        startTime = time.time()
         with graph.as_default():
             set_session(sess)
             results = model.predict(pixelArray)
@@ -251,12 +250,6 @@ def processImages():
         stream.seek(0)
         stream.truncate()
 
-print("Starting Throttle Thread...")
-try:
-    _thread.start_new_thread(controlThrottle, (pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed))
-except:
-    print("Steering or Kill Switch Thread Failed to Start")
-
 print("Loading Camera...")
 import picamera
 with picamera.PiCamera() as camera:
@@ -266,6 +259,11 @@ with picamera.PiCamera() as camera:
     print("Booting Camera...")
     time.sleep(2)
     print("Boot Complete...")
+    print("Starting Throttle Thread...")
+    try:
+        _thread.start_new_thread(controlThrottle, (pwm, screen, motorMin, motorMax, speedOptions, servoMin, servoMax, preferredSpeed))
+    except:
+        print("Steering or Kill Switch Thread Failed to Start")
     print("Starting Main Loop...")
     try:
         while True:
@@ -276,8 +274,6 @@ with picamera.PiCamera() as camera:
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
-            print(str(capturesPerCycle) + " images at ", capturesPerCycle / (endTime - startTime), "FPS")
-            print("Camera Captures in:", endTime - startTime)
             sleepTime = (1/30) - (endTime - startTime)
             time.sleep(sleepTime)
     except KeyboardInterrupt:

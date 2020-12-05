@@ -35,12 +35,11 @@ def set_servo_pulse(channel, pulse):
     pwm.set_pwm(channel, 0, pulse)
 
 # Set frequency to 60hz, good for servos.
-pwm.set_pwm_freq(60)
+pwm.set_pwm_freq(50)
 
 print('Moving servo on channel 0, press Ctrl-C to quit...')
 while True:
+    pwm = int(input("Enter PWM:"))
     # Move servo on channel O between extremes.
-    pwm.set_pwm(0, 0, servo_min)
-    time.sleep(1)
-    pwm.set_pwm(0, 0, servo_max)
+    pwm.set_pwm(0, 0, pwm)
     time.sleep(1)

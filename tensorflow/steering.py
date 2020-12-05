@@ -69,7 +69,7 @@ imageWidth = 100
 imageHeight = int(imageWidth * imageRatio)
 image_size = imageWidth
 
-cameraFramerate = 90
+cameraFramerate = 80
 
 
 # Motor & Servo
@@ -139,7 +139,7 @@ def controlMotor(speedOptions, preferredSpeed):
     numbers = [str(x) for x in range(0, 10)]
     currentThrottle = motorMin
     lastThrottle = motorMin
-    pwm.set_pwm(1, 0, motorMin)
+    pwm.set_pwm(1, 0, 325)
     while True:
         string = input("Set Motor Throttle:")
         print(string)
@@ -283,7 +283,6 @@ with picamera.PiCamera() as camera:
         while True:
             # Initialize Output Holders
             outputs = [io.BytesIO() for i in range(FPS)]
-            createOutputsTime = time.time()
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
     except KeyboardInterrupt:

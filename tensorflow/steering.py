@@ -139,7 +139,7 @@ def controlMotor(speedOptions, preferredSpeed):
     numbers = [str(x) for x in range(0, 10)]
     currentThrottle = motorMin
     lastThrottle = motorMin
-    pwm.set_pwm(1, 0, 325)
+    pwm.set_pwm(1, 0, motorMin)
     while True:
         string = input("Set Motor Throttle:")
         print(string)

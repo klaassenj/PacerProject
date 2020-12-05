@@ -137,28 +137,32 @@ def controlMotor(pwm, speedOptions, preferredSpeed):
         string = input("Set Motor Throttle:")
         print(string)
         if string in numbers:
+            print("Set Speed Option")
             currentThrottle = speedOptions[int(string)]
         elif string.lower() == 'p':
+            print("Set Preferred Speed")
             currentThrottle = preferredSpeed
         elif string == '':
+            print("Stoppp")
             currentThrottle = motorMin
-        try:
-            number = int(string)
-            if number > motorMin and number < motorMax:
-                currentThrottle = number
-            else:
-                print("Number is Out of Range.")
-        except:
-            print("Maybe this is a Pace?")
+        else:
             try:
-                if(string.endswith('s')):
-                    secondsPerLap = float(string[:-1])
-                    metersPerSecond =  400 / secondsPerLap
-                    # Convert from metersPerSecond to Throttle
-                    print("Oops TODO m/s", metersPerSecond)
-
+                number = int(string)
+                if number > motorMin and number < motorMax:
+                    currentThrottle = number
+                else:
+                    print("Number is Out of Range.")
             except:
-                print("I am lost with that...")
+                print("Maybe this is a Pace?")
+                try:
+                    if(string.endswith('s')):
+                        secondsPerLap = float(string[:-1])
+                        metersPerSecond =  400 / secondsPerLap
+                        # Convert from metersPerSecond to Throttle
+                        print("Oops TODO m/s", metersPerSecond)
+
+                except:
+                    print("I am lost with that...")
         if(currentThrottle != lastThrottle):
             print("Setting New Throttle:", currentThrottle)
             pwm.set_pwm(1, 0, currentThrottle)

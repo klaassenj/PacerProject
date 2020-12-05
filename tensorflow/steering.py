@@ -128,11 +128,13 @@ print("Mapping Keyboard Controls for ESC...")
 
 
 # TODO: Would like to change on keypress instead of on hitting enter
-def controlMotor(pwm, speedOptions, preferredSpeed):
+def controlMotor(speedOptions, preferredSpeed):
+    pwm = Adafruit_PCA9685.PCA9685()
+    pwm.set_pwm_freq(50)
     numbers = [str(x) for x in range(0, 10)]
     currentThrottle = motorMin
     lastThrottle = currentThrottle
-    pwm.set_pwm(1, 0, currentThrottle)
+    pwm.set_pwm(1, 0, 325)
     while True:
         string = input("Set Motor Throttle:")
         print(string)
@@ -267,9 +269,10 @@ with picamera.PiCamera() as camera:
     time.sleep(2)
     print("Boot Complete...")
     try:
-        _thread.start_new_thread(controlMotor, (pwm, speedOptions, preferredSpeed))
+        print("Starting Motor...")
+        _thread.start_new_thread(controlMotor, (speedOptions, preferredSpeed))
     except:
-        print("Thread creation failed")
+        print("Motor failed to Start...")
     print("Starting Main Loop...")
     try:
         while True:

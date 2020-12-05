@@ -55,6 +55,13 @@ import sys
 
 # Initalize Variables
 
+servoConstraint = 0
+args = sys.argv
+if(len(args) > 1):
+    servoConstraint = int(args[1])
+
+
+
 # Camera
 print("Initializing Camera Environment...")
 numCycles = 0
@@ -79,8 +86,8 @@ pulseFrequency = 50 # ESC takes 50 Hz
 currentThrottle = 0
 preferredSpeed = 425
 servoMiddle = (servoMax + servoMin) // 2
-directionLeft = (servoMin + servoMiddle) // 2
-directionRight = (servoMax + servoMiddle) // 2
+directionLeft = ((servoMin + servoConstraint) + servoMiddle) // 2
+directionRight = ((servoMax - servoConstraint) + servoMiddle) // 2
 directionMiddleLeft = (directionLeft + servoMiddle) // 2
 directionMiddleRight = (directionRight + servoMiddle) // 2
 currentThrottle = 0
@@ -133,8 +140,8 @@ def controlMotor(speedOptions, preferredSpeed):
     pwm.set_pwm_freq(50)
     numbers = [str(x) for x in range(0, 10)]
     currentThrottle = motorMin
-    lastThrottle = currentThrottle
-    pwm.set_pwm(1, 0, 325)
+    lastThrottle = motorMin
+    pwm.set_pwm(1, 0, motorMin)
     while True:
         string = input("Set Motor Throttle:")
         print(string)
@@ -284,6 +291,7 @@ with picamera.PiCamera() as camera:
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
+            print("Possible FPS: ", 40 / (endTime - startTime))
             sleepTime = (1/FPS) - (endTime - startTime)
             if sleepTime > 0:
                 time.sleep(sleepTime)

@@ -60,10 +60,6 @@ FPS = 40
 args = sys.argv
 if(len(args) > 1):
     servoConstraint = int(args[1])
-if(len(args) > 2):
-    FPS = int(args[2])
-
-
 
 # Camera
 print("Initializing Camera Environment...")
@@ -285,18 +281,11 @@ with picamera.PiCamera() as camera:
     print("Starting Main Loop...")
     try:
         while True:
-            startTime = time.time()
             # Initialize Output Holders
             outputs = [io.BytesIO() for i in range(FPS)]
             createOutputsTime = time.time()
-            
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
-            endTime = time.time()
-            print("Possible FPS: ", FPS / (endTime - startTime))
-            sleepTime = (1/FPS) - (endTime - startTime)
-            if sleepTime > 0:
-                time.sleep(sleepTime)
     except KeyboardInterrupt:
         print("Cleaning up and Shutting down...")
         pwm.set_pwm(1, 0, motorMin)

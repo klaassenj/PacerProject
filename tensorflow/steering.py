@@ -56,9 +56,12 @@ import sys
 # Initalize Variables
 
 servoConstraint = 0
+FPS = 40
 args = sys.argv
 if(len(args) > 1):
     servoConstraint = int(args[1])
+if(len(args) > 2):
+    FPS = int(args[2])
 
 
 
@@ -69,9 +72,8 @@ imageRatio = 1
 imageWidth = 100
 imageHeight = int(imageWidth * imageRatio)
 image_size = imageWidth
-capturesPerCycle = 40
-cameraFramerate = 80
-FPS = 30
+
+cameraFramerate = 90
 
 
 # Motor & Servo
@@ -229,7 +231,7 @@ def processImages():
     global pwm
     stream = io.BytesIO()
     
-    for i in range(capturesPerCycle):
+    for i in range(FPS):
         yield stream
         # Load Image from Camera
         stream.seek(0)
@@ -285,13 +287,13 @@ with picamera.PiCamera() as camera:
         while True:
             startTime = time.time()
             # Initialize Output Holders
-            outputs = [io.BytesIO() for i in range(capturesPerCycle)]
+            outputs = [io.BytesIO() for i in range(FPS)]
             createOutputsTime = time.time()
             
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = time.time()
-            print("Possible FPS: ", 40 / (endTime - startTime))
+            print("Possible FPS: ", FPS / (endTime - startTime))
             sleepTime = (1/FPS) - (endTime - startTime)
             if sleepTime > 0:
                 time.sleep(sleepTime)

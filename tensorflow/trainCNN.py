@@ -122,7 +122,7 @@ history = model.fit_generator(
       validation_steps=50,  # 1000 images = batch_size * steps
       verbose=2)
 
-model.save_weights("weightsV2/weightsV2")
+model.save_weights("weightsV3/weightsV3")
 
 uncompiledModel = Model(img_input, output)
 
@@ -154,6 +154,8 @@ for i in range(10):
     print(strings)
     print([float(x) for x in strings])
     print(results, timeTaken)
+    img.show()
+    input("Next")
 
 
 # RIGHT --------------
@@ -170,6 +172,8 @@ for i in range(10):
     results = model(x, training=False)
     timeTaken = time.time() - start
     print(results, timeTaken)
+    img.show()
+    input("Next")
 
 
 # STRAIGHT ---------------------
@@ -186,6 +190,8 @@ for i in range(10):
     results = model(x, training=False)
     timeTaken = time.time() - start
     print(results, timeTaken)
+    img.show()
+    input("Next")
 
 # Retrieve a list of accuracy results on training and validation data
 # sets for each training epoch

@@ -31,7 +31,7 @@ import numpy as np
 import os
 from os import listdir
 from os.path import isfile, join
-path = './MLData'
+path = '../MLData'
 filenames = [f for f in listdir(path) if isfile(join(path, f))]
 print("# of Files: ", len(filenames))
 
@@ -70,13 +70,13 @@ for filename in filenames:
     print(prediction)
     stringList = str(prediction).replace('[', '').replace(']', '').strip().split()
     floatList = [float(s) for s in stringList]
-    prediction = 'Left/'
+    prediction = 'Straight/'
     maxFloat = floatList[0]
     if(floatList[1] > floatList[0]):
         maxFloat = floatList[1]
-        prediction = 'Right/'
+        prediction = 'Left/'
     if(floatList[2] > maxFloat):
-        prediction = 'Straight/'
+        prediction = 'Right/'
     print(prediction)
     print(filename)
     os.rename(path + filename, path + prediction + filename)

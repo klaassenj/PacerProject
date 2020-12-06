@@ -124,7 +124,7 @@ model.compile(loss='binary_crossentropy',
 
 # Load Model
 print("Loading Model...")
-model.load_weights("weightsV1/weightsV1")
+model.load_weights("weightsV3/weightsV3")
 
 
 print("Mapping Keyboard Controls for ESC...")
@@ -243,8 +243,8 @@ def processImages():
             strings = strings[1].split(']]')
             strings = strings[0].split()
             numbers = [float(x) for x in strings]
-            leftComponent = int(int(numbers[1] * 100) / 100)
-            rightComponent = int(int(numbers[0] * 100) / 100)
+            leftComponent = int(int(numbers[0] * 100) / 100)
+            rightComponent = int(int(numbers[1] * 100) / 100)
             straightComponent = int(int(numbers[2] * 100) / 100)
             prediction = 'Straight'
             if(leftComponent > straightComponent):

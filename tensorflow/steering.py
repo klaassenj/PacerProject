@@ -45,7 +45,7 @@ import numpy as np
 import random
 from io import BytesIO
 import time
-from PIL import Image
+from PIL.Image import open as loadImage
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import time
@@ -200,14 +200,14 @@ def processImages():
         startTime = stamp()
         # Load Image from Camera
         stream.seek(0)
-        image = Image.open(stream)
+        image = loadImage(stream)
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
         imageLoadTime = stamp()
         # Predict with Model
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray, training=False)
+            results = model.predict(pixelArray)
             modelTime = stamp()
             # Stringify Results
             string = str(results)

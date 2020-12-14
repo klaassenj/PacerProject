@@ -56,7 +56,7 @@ import sys
 # Initalize Variables
 
 servoConstraint = 0
-FPS = 40
+FPS = 500
 args = sys.argv
 if(len(args) > 1):
     servoConstraint = int(args[1])
@@ -69,7 +69,7 @@ imageWidth = 100
 imageHeight = int(imageWidth * imageRatio)
 image_size = imageWidth
 
-cameraFramerate = 80
+cameraFramerate = 90
 
 
 # Motor & Servo
@@ -269,7 +269,7 @@ with picamera.PiCamera() as camera:
             print("Time Taken:", (endTime-startTime))
             totalTime += (endTime-startTime)
             count +=1
-            print("Avg FPS:", 40/(totalTime/count))
+            print("Avg FPS:", FPS/(totalTime/count))
 
             
     except KeyboardInterrupt:

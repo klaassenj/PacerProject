@@ -43,7 +43,7 @@ from tensorflow.keras import layers
 from tensorflow.keras import Model
 import numpy as np
 import random
-import io
+from io import BytesIO
 import time
 from PIL import Image
 from PIL import ImageFile
@@ -193,7 +193,7 @@ def processImages():
     global sess
     global graph
     global pwm
-    stream = io.BytesIO()
+    stream = BytesIO()
     
     for i in range(FPS):
         yield stream
@@ -257,7 +257,7 @@ with picamera.PiCamera() as camera:
         while True:
             # Initialize Output Holders
             startTime = stamp()
-            outputs = [io.BytesIO() for i in range(FPS)]
+            outputs = [BytesIO() for i in range(FPS)]
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = stamp()

@@ -240,6 +240,7 @@ with picamera.PiCamera() as camera:
     camera.resolution = (imageWidth, imageHeight)
     camera.color_effects = (128, 128)
     camera.framerate = cameraFramerate
+    camera.led = True
     print("Booting Camera...")
     sleep(2)
     print("Boot Complete...")

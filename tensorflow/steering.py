@@ -215,7 +215,6 @@ def processImages():
             leftComponent = int(numbers[0] * 100) / 100
             rightComponent = int(numbers[1] * 100) / 100
             straightComponent = int(numbers[2] * 100) / 100
-            print(leftComponent, rightComponent, straightComponent)
             prediction = 'Straight'
             if(leftComponent > straightComponent):
                 prediction = 'Left'

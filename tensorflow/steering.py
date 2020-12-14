@@ -208,15 +208,17 @@ def processImages():
         with graph.as_default():
             set_session(sess)
             results = model.predict(pixelArray)
+            modelTime = stamp()
             # Stringify Results
             string = str(results)
             strings = string.split('[[')
             strings = strings[1].split(']]')
             strings = strings[0].split()
             numbers = [float(x) for x in strings]
-            leftComponent = int(int(numbers[0] * 100) / 100)
-            rightComponent = int(int(numbers[1] * 100) / 100)
-            straightComponent = int(int(numbers[2] * 100) / 100)
+            leftComponent = int(numbers[0] * 100) / 100
+            rightComponent = int(numbers[1] * 100) / 100
+            straightComponent = int(numbers[2] * 100) / 100
+            print(leftComponent, rightComponent, straightComponent)
             prediction = 'Straight'
             if(leftComponent > straightComponent):
                 prediction = 'Left'
@@ -228,7 +230,7 @@ def processImages():
                 prediction = 'Straight-Right'
         
         predictTime = stamp()
-        print("PredictTime:", predictTime - imageLoadTime, "ImageLoadTime:", imageLoadTime - startTime)
+        print("PredictTime:", predictTime - imageLoadTime, "ImageLoadTime:", imageLoadTime - startTime, "ModelTime:", modelTime - imageLoadTime)
         # Set Direction
         direction = processPrediction(prediction)
         # Turn Steering Servo

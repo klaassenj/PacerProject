@@ -126,13 +126,9 @@ model.compile(loss='binary_crossentropy',
 print("Loading Model...")
 model.load_weights("weightsV3/weightsV3")
 
+print("Defining Functions...")
 
-print("Mapping Keyboard Controls for ESC...")
-
-# Register Keyboard presses
-
-
-# TODO: Would like to change on keypress instead of on hitting enter
+# Control Motor with User Inputs
 def controlMotor(speedOptions, preferredSpeed):
     pwm = Adafruit_PCA9685.PCA9685()
     pwm.set_pwm_freq(50)
@@ -176,34 +172,6 @@ def controlMotor(speedOptions, preferredSpeed):
         lastThrottle = currentThrottle
 
 
-# from pynput import keyboard
-# def on_press(key):
-#     global speedOptions
-#     numbers = [str(x) for x in range(0, 10)]
-#     stop = ['s', 'enter']
-#     if key == keyboard.Key.esc:
-#         print("Not Listening for Keys Anymore.")
-#         pwm.set_pwm(1, 0, motorMin)
-#         return False  # stop listener
-#     try:
-#         k = key.char  # single-char keys
-#     except:
-#         k = key.name  # other keys
-#     print("Received Key:", k)
-#     if k in numbers:  # keys of interest
-#         # self.keys.append(k)  # store it in global-like variable
-#         print("Setting Speed to", speedOptions[k])
-#         pwm.set_pwm(1, 0, speedOptions[k])
-#     if k in stop:
-#         print("Setting Speed to", motorMin)
-#         pwm.set_pwm(1, 0, motorMin)
-#     sleep(0.1)
-
-# listener = keyboard.Listener(on_press=on_press)
-# listener.start()  # start to listen on a separate thread
-
-
-print("Defining Functions...")
 
 # Map Predictions to steering output
 def processPrediction(predictionString):
@@ -293,6 +261,7 @@ with picamera.PiCamera() as camera:
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
             endTime = stamp()
             print("FPS:", FPS/(endTime-startTime))
+            print("Time Taken:", (endTime-startTime))
 
             
     except KeyboardInterrupt:

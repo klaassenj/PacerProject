@@ -29,7 +29,7 @@ from __future__ import division
 print("Gathering Libraries...")
 import os
 
-import time
+from time import time as stamp, sleep
 import _thread
 import tensorflow as tf
 from tensorflow import keras
@@ -197,7 +197,7 @@ def controlMotor(speedOptions, preferredSpeed):
 #     if k in stop:
 #         print("Setting Speed to", motorMin)
 #         pwm.set_pwm(1, 0, motorMin)
-#     time.sleep(0.1)
+#     sleep(0.1)
 
 # listener = keyboard.Listener(on_press=on_press)
 # listener.start()  # start to listen on a separate thread
@@ -229,11 +229,13 @@ def processImages():
     
     for i in range(FPS):
         yield stream
+        startTime = stamp()
         # Load Image from Camera
         stream.seek(0)
         image = Image.open(stream)
         pixelArray = img_to_array(image) 
         pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+        imageLoadTime = stamp()
         # Predict with Model
         with graph.as_default():
             set_session(sess)
@@ -256,10 +258,13 @@ def processImages():
             if rightComponent != 0 and straightComponent != 0:
                 prediction = 'Straight-Right'
         
+        predictTime = stamp()
+        print("PredictTime:", predictTime - imageLoadTime, "ImageLoadTime:", imageLoadTime - startTime)
         # Set Direction
         direction = processPrediction(prediction)
         # Turn Steering Servo
         pwm.set_pwm(0, 0, int(direction))
+
         # Reset Stream
         stream.seek(0)
         stream.truncate()
@@ -271,7 +276,7 @@ with picamera.PiCamera() as camera:
     camera.color_effects = (128, 128)
     camera.framerate = cameraFramerate
     print("Booting Camera...")
-    time.sleep(2)
+    sleep(2)
     print("Boot Complete...")
     try:
         print("Starting Motor...")
@@ -282,12 +287,17 @@ with picamera.PiCamera() as camera:
     try:
         while True:
             # Initialize Output Holders
+            startTime = stamp()
             outputs = [io.BytesIO() for i in range(FPS)]
             # Capture Image
             camera.capture_sequence(processImages(), 'jpeg', use_video_port=True)
+            endTime = stamp()
+            print("FPS:", FPS/(endTime-startTime))
+
+            
     except KeyboardInterrupt:
         print("Cleaning up and Shutting down...")
         pwm.set_pwm(1, 0, motorMin)
         pwm.set_pwm(0, 0, servoMiddle)
-        time.sleep(1)
+        sleep(1)
         print("Shutdown.")

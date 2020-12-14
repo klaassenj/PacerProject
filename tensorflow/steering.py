@@ -97,6 +97,7 @@ print("Starting Tensorflow...")
 sess = tf.Session()
 graph = tf.get_default_graph()
 set_session(sess)
+tf.config.optimizer.set_jit(True)
 
 
 # Build ML CNN Model

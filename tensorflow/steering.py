@@ -207,7 +207,7 @@ def processImages():
         # Predict with Model
         with graph.as_default():
             set_session(sess)
-            results = model.predict(pixelArray)
+            results = model.predict(pixelArray, training=False)
             modelTime = stamp()
             # Stringify Results
             string = str(results)

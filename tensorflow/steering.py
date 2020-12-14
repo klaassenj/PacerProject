@@ -226,20 +226,20 @@ def processImages():
     global graph
     global pwm
     stream = io.BytesIO()
-    
-    for i in range(FPS):
-        yield stream
-        startTime = stamp()
-        # Load Image from Camera
-        stream.seek(0)
-        image = Image.open(stream)
-        pixelArray = img_to_array(image) 
-        pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
-        imageLoadTime = stamp()
-        # Predict with Model
-        with graph.as_default():
-            set_session(sess)
+    with graph.as_default():
+        set_session(sess)
+        for i in range(FPS):
+            yield stream
+            startTime = stamp()
+            # Load Image from Camera
+            stream.seek(0)
+            image = Image.open(stream)
+            pixelArray = img_to_array(image) 
+            pixelArray = pixelArray.reshape((1,) + pixelArray.shape)
+            imageLoadTime = stamp()
+            # Predict with Model
             results = model.predict(pixelArray)
+            # Stringify Results
             string = str(results)
             strings = string.split('[[')
             strings = strings[1].split(']]')
@@ -257,17 +257,17 @@ def processImages():
                 prediction = 'Straight-Left'
             if rightComponent != 0 and straightComponent != 0:
                 prediction = 'Straight-Right'
-        
-        predictTime = stamp()
-        print("PredictTime:", predictTime - imageLoadTime, "ImageLoadTime:", imageLoadTime - startTime)
-        # Set Direction
-        direction = processPrediction(prediction)
-        # Turn Steering Servo
-        pwm.set_pwm(0, 0, int(direction))
+            
+            predictTime = stamp()
+            print("PredictTime:", predictTime - imageLoadTime, "ImageLoadTime:", imageLoadTime - startTime)
+            # Set Direction
+            direction = processPrediction(prediction)
+            # Turn Steering Servo
+            pwm.set_pwm(0, 0, int(direction))
 
-        # Reset Stream
-        stream.seek(0)
-        stream.truncate()
+            # Reset Stream
+            stream.seek(0)
+            stream.truncate()
 
 print("Loading Camera...")
 import picamera

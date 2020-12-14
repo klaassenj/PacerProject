@@ -256,6 +256,8 @@ with picamera.PiCamera() as camera:
         print("Motor failed to Start...")
     print("Starting Main Loop...")
     try:
+        totalTime = 0
+        count = 0
         while True:
             # Initialize Output Holders
             startTime = stamp()
@@ -265,6 +267,9 @@ with picamera.PiCamera() as camera:
             endTime = stamp()
             print("FPS:", FPS/(endTime-startTime))
             print("Time Taken:", (endTime-startTime))
+            totalTime += (endTime-startTime)
+            count +=1
+            print("Avg FPS:", 40/(totalTime/count))
 
             
     except KeyboardInterrupt:

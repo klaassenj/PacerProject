@@ -54,8 +54,13 @@ import Adafruit_PCA9685
 import sys
 
 # Initalize Variables
-
-servoConstraint = 0
+motorMin = 300
+motorMax = 450
+servoMin = 220
+servoMax = 420
+servoConstraint = 0 # Minimum = 0, Maximum(No steering) = (motorMax - motorMin) / 2
+speedOptions = [(x * 15 + 320) for x in range(0, 10)]
+cameraFramerate = 90
 FPS = 500
 args = sys.argv
 if(len(args) > 1):
@@ -69,17 +74,9 @@ imageWidth = 100
 imageHeight = int(imageWidth * imageRatio)
 image_size = imageWidth
 
-cameraFramerate = 90
-
-
 # Motor & Servo
 print("Initializing Motor & Servo...")
 pwm = Adafruit_PCA9685.PCA9685()
-motorMin = 300
-motorMax = 450
-speedOptions = [(x * 15 + 320) for x in range(0, 10)]
-servoMin = 220
-servoMax = 420
 pulseFrequency = 50 # ESC takes 50 Hz
 currentThrottle = 0
 preferredSpeed = 425
@@ -250,6 +247,7 @@ with picamera.PiCamera() as camera:
     except:
         print("Motor failed to Start...")
     print("Starting Main Loop...")
+    print("Received ", servoConstraint, "as the Servo Constraint")
     try:
         totalTime = 0
         count = 0

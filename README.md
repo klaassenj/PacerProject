@@ -2,6 +2,9 @@
 
 ## RC Pacer
 
+![image](https://user-images.githubusercontent.com/13790123/142626169-27312809-a43c-4b66-9824-c2d5b4e119fc.png)
+
+
 Pi powered Traxxas Slash follows the lines on the track to pace athletes to Personal Bests.
 
 The attached Pi Camera feeds a stream of images to a Image Classification Convolutional Neural Net.
